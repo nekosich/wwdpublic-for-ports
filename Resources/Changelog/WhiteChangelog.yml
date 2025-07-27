@@ -3919,3 +3919,25 @@ Entries:
   id: 416
   time: '2025-07-26T03:14:35.0000000+00:00'
   url: https://github.com/WWhiteDreamProject/wwdpublic/pull/690
+- author: nekosich
+  changes:
+    - type: Tweak
+      message: 'Много перевода. '
+    - type: Fix
+      message: >-
+        Исправление бага, из-за которого LocalizedDataset неверно читал
+        ftl-ключи.
+  id: 417
+  time: '2025-07-27T14:04:41.0000000+00:00'
+  url: https://github.com/WWhiteDreamProject/wwdpublic/pull/704
+- author: Spatison
+  changes:
+    - type: Add
+      message: 'Добавлен новый ивент: "Заражения Ксеноморфами"'
+    - type: Add
+      message: Добавлены новые ксеноморфы
+    - type: Add
+      message: Добавлена новая тема оформления ксеноморфа
+  id: 418
+  time: '2025-07-27T15:11:03.0000000+00:00'
+  url: https://github.com/WWhiteDreamProject/wwdpublic/pull/716
