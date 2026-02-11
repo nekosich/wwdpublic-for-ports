@@ -93,7 +93,56 @@
     - AllowGhostShownByEvent
 
 - type: entity
-  parent: MobObserverBase
+  parent:
+  - Incorporeal
+  - BaseMob
+  id: MobObserverVisualBase
+  abstract: true
+  name: observer
+  description: Boo!
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: ContentEye
+    maxZoom: 1.44,1.44
+  - type: Eye
+    drawFov: false
+    visMask:
+    - TelegnosticProjection
+    - PsionicInvisibility
+    - Ghost
+    - Normal
+    - Ethereal
+  - type: Input
+    context: "ghost"
+  - type: Examiner
+    skipChecks: true
+  - type: Ghost
+  - type: GhostHearing
+  - type: ShowElectrocutionHUD
+  - type: IntrinsicRadioReceiver
+  - type: ActiveRadio
+    receiveAllChannels: true
+    globalReceive: true
+  - type: UniversalLanguageSpeaker # Ghosts should understand any language.
+  - type: PointLight
+    netsync: false
+    radius: 6
+    castShadows: false
+    enabled: false
+  - type: UserInterface
+    interfaces:
+      enum.RevivalContractUiKey.Key: # Goobstation - Devil
+        type: RevivalContractBoundUserInterface
+        requireInputValidation: false
+  - type: NoNormalInteraction
+  - type: Spectral
+  - type: Tag
+    tags:
+    - BypassInteractionRangeChecks
+    - AllowGhostShownByEvent
+
+- type: entity
+  parent: MobObserverVisualBase
   id: MobObserverVisualHumanoid
   categories: [ HideSpawnMenu ]
   components:
@@ -167,15 +216,9 @@
         sprite: Mobs/Effects/burn_damage.rsi
   - type: IgnoreSlowOnDamage
   - type: SpeedModifierImmunity
-  - type: NoNormalInteraction
-  - type: Spectral
-  - type: Tag
-    tags:
-    - BypassInteractionRangeChecks
-    - AllowGhostShownByEvent
 
 - type: entity
-  parent: MobObserverBase
+  parent: MobObserverVisualBase
   id: MobObserverVisualArachne
   categories: [ HideSpawnMenu ]
   components:
@@ -256,12 +299,6 @@
         sprite: Mobs/Effects/burn_damage.rsi
   - type: IgnoreSlowOnDamage
   - type: SpeedModifierImmunity
-  - type: NoNormalInteraction
-  - type: Spectral
-  - type: Tag
-    tags:
-    - BypassInteractionRangeChecks
-    - AllowGhostShownByEvent
 
 - type: entity
   parent: MobObserverVisualHumanoid
