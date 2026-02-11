@@ -10,7 +10,6 @@ using Content.Server.Humanoid;
 using Content.Server.Mind;
 using Content.Server.Players.PlayTimeTracking;
 using Content.Server.Preferences.Managers;
-using Content.Server.Roles;
 using Content.Server.Roles.Jobs;
 using Content.Server.Station.Systems;
 using Content.Shared._White.CustomGhostSystem;
@@ -30,6 +29,7 @@ using Content.Shared.Follower;
 using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
 using Content.Shared.Humanoid;
+using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Inventory;
 using Content.Shared.Item;
 using Content.Shared.Mind;
@@ -46,6 +46,7 @@ using Content.Shared.Roles;
 using Content.Shared.SSDIndicator;
 using Content.Shared.Storage.Components;
 using Content.Shared.Tag;
+using Content.Shared.Traits.Assorted.Components;
 using Content.Shared.Warps;
 using Robust.Server.GameObjects;
 using Robust.Server.Player;
@@ -94,10 +95,8 @@ namespace Content.Server.Ghost
         [Dependency] private readonly SharedPopupSystem _popup = default!;
         [Dependency] private readonly IRobustRandom _random = default!;
         [Dependency] private readonly TagSystem _tag = default!;
-        // WD EDIT START
+        [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
         [Dependency] private readonly IServerPreferencesManager _prefs = default!;
-        [Dependency] private readonly RoleSystem _roles = default!;
-        // WD EDIT END
 
         private EntityQuery<GhostComponent> _ghostQuery;
         private EntityQuery<PhysicsComponent> _physicsQuery;
@@ -128,6 +127,7 @@ namespace Content.Server.Ghost
             "id",
             "belt",
             "back",
+            "suitstorage",
             "innerBelt",
             "innerNeck"
         };
@@ -678,6 +678,8 @@ namespace Content.Server.Ghost
             {
                 ghostComponent.CanGhostInteract = false;
                 EnsureComp<IgnoreSlowOnDamageComponent>(ghost);
+                EnsureComp<SpeedModifierImmunityComponent>(ghost);
+                _movementSpeed.RefreshMovementSpeedModifiers(ghost);
             }
 
             // Try setting the ghost entity name to either the character name or the player name.
@@ -714,9 +716,6 @@ namespace Content.Server.Ghost
         {
             ghost = default;
 
-            if (!_prototypeManager.HasIndex<EntityPrototype>(VisualObserverPrototypeName))
-                return false;
-
             if (mind.Comp.UserId is not { } userId)
                 return false;
 
@@ -724,7 +723,10 @@ namespace Content.Server.Ghost
             if (prefs?.SelectedCharacter is not HumanoidCharacterProfile profile)
                 return false;
 
-            ghost = SpawnAtPosition(VisualObserverPrototypeName, spawnPosition);
+            if (!TryGetVisualObserverPrototype(profile.Species, out var ghostPrototype))
+                return false;
+
+            ghost = SpawnAtPosition(ghostPrototype, spawnPosition);
 
             if (!HasComp<HumanoidAppearanceComponent>(ghost))
             {
@@ -792,13 +794,10 @@ namespace Content.Server.Ghost
         {
             ghost = default;
 
-            if (!_prototypeManager.HasIndex<EntityPrototype>(VisualObserverPrototypeName))
+            if (!TryGetVisualObserverPrototype(sourceEntity, out var ghostPrototype))
                 return false;
 
-            if (!HasComp<HumanoidAppearanceComponent>(sourceEntity))
-                return false;
-
-            ghost = SpawnAtPosition(VisualObserverPrototypeName, spawnPosition);
+            ghost = SpawnAtPosition(ghostPrototype, spawnPosition);
 
             if (!HasComp<HumanoidAppearanceComponent>(ghost))
             {
@@ -840,12 +839,12 @@ namespace Content.Server.Ghost
 
         private bool TryCaptureMindHumanoidSnapshot(EntityUid mindId, EntityUid sourceEntity)
         {
-            if (!Exists(sourceEntity) || !HasComp<HumanoidAppearanceComponent>(sourceEntity))
+            if (!Exists(sourceEntity) || !TryGetVisualObserverPrototype(sourceEntity, out var ghostPrototype))
                 return false;
 
             ClearMindHumanoidSnapshot(mindId);
 
-            var snapshot = Spawn(VisualObserverPrototypeName, MapCoordinates.Nullspace);
+            var snapshot = Spawn(ghostPrototype, MapCoordinates.Nullspace);
             if (!HasComp<HumanoidAppearanceComponent>(snapshot))
             {
                 QueueDel(snapshot);
@@ -857,6 +856,58 @@ namespace Content.Server.Ghost
             CopyDamageSnapshot(sourceEntity, snapshot);
             CopyInventorySnapshot(sourceEntity, snapshot);
             return true;
+        }
+
+        private bool TryGetVisualObserverPrototype(EntityUid sourceEntity, out string prototype)
+        {
+            prototype = default!;
+            if (!TryComp<HumanoidAppearanceComponent>(sourceEntity, out var humanoid))
+                return false;
+
+            return TryGetVisualObserverPrototype(humanoid.Species, out prototype);
+        }
+
+        private bool TryGetVisualObserverPrototype(ProtoId<SpeciesPrototype> species, out string prototype)
+        {
+            prototype = VisualObserverPrototypeName;
+            if (!_prototypeManager.TryIndex(species, out var speciesPrototype))
+                return _prototypeManager.HasIndex<EntityPrototype>(prototype);
+
+            var bySpecies = $"MobObserverVisual{speciesPrototype.ID}";
+            if (_prototypeManager.HasIndex<EntityPrototype>(bySpecies))
+            {
+                prototype = bySpecies;
+                return true;
+            }
+
+            var byDoll = TryGetVisualObserverPrototypeFromDoll(speciesPrototype.DollPrototype);
+            if (byDoll != null && _prototypeManager.HasIndex<EntityPrototype>(byDoll))
+            {
+                prototype = byDoll;
+                return true;
+            }
+
+            return _prototypeManager.HasIndex<EntityPrototype>(prototype);
+        }
+
+        private static string? TryGetVisualObserverPrototypeFromDoll(EntProtoId dollPrototype)
+        {
+            const string dollPrefix = "Mob";
+            const string dollSuffix = "Dummy";
+
+            var dollId = dollPrototype.Id;
+            if (!dollId.StartsWith(dollPrefix, StringComparison.Ordinal) ||
+                !dollId.EndsWith(dollSuffix, StringComparison.Ordinal))
+            {
+                return null;
+            }
+
+            var speciesIdLength = dollId.Length - dollPrefix.Length - dollSuffix.Length;
+            if (speciesIdLength <= 0)
+                return null;
+
+            var speciesId = dollId.Substring(dollPrefix.Length, speciesIdLength);
+            return $"MobObserverVisual{speciesId}";
         }
 
         private void ClearMindHumanoidSnapshot(EntityUid mindId)
