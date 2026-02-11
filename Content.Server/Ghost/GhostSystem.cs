@@ -2,13 +2,18 @@ using System.Linq;
 using System.Numerics;
 using Content.Server.Administration.Logs;
 using Content.Server.Chat.Managers;
+using Content.Server.Clothing.Systems;
 using Content.Server.GameTicking;
 using Content.Server.Ghost.Components;
+using Content.Server.Humanoid;
 using Content.Server.Mind;
+using Content.Server.Players.PlayTimeTracking;
 using Content.Server.Preferences.Managers;
 using Content.Server.Roles;
 using Content.Server.Roles.Jobs;
+using Content.Server.Station.Systems;
 using Content.Shared._White.CustomGhostSystem;
+using Content.Shared.Clothing.EntitySystems;
 using Content.Shared._White.Roles;
 using Content.Shared.Actions;
 using Content.Shared.CCVar;
@@ -19,7 +24,11 @@ using Content.Shared.Examine;
 using Content.Shared.Eye;
 using Content.Shared.FixedPoint;
 using Content.Shared.Follower;
+using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
+using Content.Shared.Humanoid;
+using Content.Shared.Inventory;
+using Content.Shared.Item;
 using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
@@ -27,7 +36,10 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Players;
+using Content.Shared.Preferences;
 using Content.Shared.Popups;
+using Content.Shared.Roles;
 using Content.Shared.SSDIndicator;
 using Content.Shared.Storage.Components;
 using Content.Shared.Tag;
@@ -49,15 +61,23 @@ namespace Content.Server.Ghost
     {
         [Dependency] private readonly SharedActionsSystem _actions = default!;
         [Dependency] private readonly IAdminLogManager _adminLog = default!;
+        [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
         [Dependency] private readonly SharedEyeSystem _eye = default!;
+        [Dependency] private readonly ClothingSystem _clothing = default!;
         [Dependency] private readonly FollowerSystem _followerSystem = default!;
         [Dependency] private readonly IGameTiming _gameTiming = default!;
+        [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
+        [Dependency] private readonly InventorySystem _inventory = default!;
+        [Dependency] private readonly SharedItemSystem _item = default!;
         [Dependency] private readonly JobSystem _jobs = default!;
         [Dependency] private readonly EntityLookupSystem _lookup = default!;
+        [Dependency] private readonly LoadoutSystem _loadout = default!;
         [Dependency] private readonly MindSystem _minds = default!;
         [Dependency] private readonly MobStateSystem _mobState = default!;
         [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+        [Dependency] private readonly PlayTimeTrackingManager _playTimeTracking = default!;
         [Dependency] private readonly IPlayerManager _playerManager = default!;
+        [Dependency] private readonly StationSpawningSystem _stationSpawning = default!;
         [Dependency] private readonly TransformSystem _transformSystem = default!;
         [Dependency] private readonly VisibilitySystem _visibilitySystem = default!;
         [Dependency] private readonly MetaDataSystem _metaData = default!;
@@ -80,6 +100,15 @@ namespace Content.Server.Ghost
         private EntityQuery<PhysicsComponent> _physicsQuery;
 
         public static readonly Color AntagonistButtonColor = Color.FromHex("#7F4141"); // WWDP EDIT
+
+        [ValidatePrototypeId<EntityPrototype>]
+        private const string VisualObserverPrototypeName = "MobObserverVisualHumanoid";
+
+        private enum GhostSpawnMode
+        {
+            Default,
+            LobbyObserver
+        }
 
         public override void Initialize()
         {
@@ -535,7 +564,13 @@ namespace Content.Server.Ghost
             bool canReturn = false)
         {
             _transformSystem.TryGetMapOrGridCoordinates(targetEntity, out var spawnPosition);
-            return SpawnGhost(mind, spawnPosition, canReturn);
+            return SpawnGhost(mind, spawnPosition, canReturn, targetEntity);
+        }
+
+        public EntityUid? SpawnLobbyObserverGhost(Entity<MindComponent?> mind, EntityCoordinates? spawnPosition = null,
+            bool canReturn = false)
+        {
+            return SpawnGhostInternal(mind, spawnPosition, canReturn, GhostSpawnMode.LobbyObserver);
         }
 
         private bool IsValidSpawnPosition(EntityCoordinates? spawnPosition)
@@ -556,7 +591,13 @@ namespace Content.Server.Ghost
         }
 
         public EntityUid? SpawnGhost(Entity<MindComponent?> mind, EntityCoordinates? spawnPosition = null,
-            bool canReturn = false)
+            bool canReturn = false, EntityUid? sourceEntity = null)
+        {
+            return SpawnGhostInternal(mind, spawnPosition, canReturn, GhostSpawnMode.Default, sourceEntity);
+        }
+
+        private EntityUid? SpawnGhostInternal(Entity<MindComponent?> mind, EntityCoordinates? spawnPosition,
+            bool canReturn, GhostSpawnMode mode, EntityUid? sourceEntity = null)
         {
             if (!Resolve(mind, ref mind.Comp))
                 return null;
@@ -577,23 +618,33 @@ namespace Content.Server.Ghost
                 return null;
             }
 
-            // WWDP EDIT START
-            CustomGhostPrototype? customGhost = null;
-            if (_prototypeManager.TryIndex(_prefs.GetPreferencesOrNull(mind.Comp.UserId)?.CustomGhost, out var ghostProto))
-                customGhost = ghostProto;
+            EntityUid ghost;
+            var spawnedVisualGhost = false;
 
-            var ghost = SpawnAtPosition(customGhost?.GhostEntityPrototype ?? GameTicker.ObserverPrototypeName, spawnPosition.Value);
-            // WWDP EDIT END
+            if (mode == GhostSpawnMode.LobbyObserver)
+                spawnedVisualGhost = TrySpawnLobbyObserverGhost(mind, spawnPosition.Value, out ghost);
+            else if (sourceEntity is { } source && Exists(source))
+                spawnedVisualGhost = TrySpawnBodySnapshotGhost(source, spawnPosition.Value, out ghost);
 
-            var ghostComponent = Comp<GhostComponent>(ghost);
+            if (!spawnedVisualGhost)
+                ghost = SpawnFallbackGhost(mind, spawnPosition.Value);
+
+            if (!TryComp<GhostComponent>(ghost, out var ghostComponent))
+            {
+                Log.Error($"Spawned ghost prototype without {nameof(GhostComponent)}: {ToPrettyString(ghost)}");
+                QueueDel(ghost);
+                _minds.TransferTo(mind.Owner, null, createGhost: false, mind: mind.Comp);
+                return null;
+            }
+
+            if (spawnedVisualGhost)
+                ghostComponent.CanGhostInteract = false;
 
             // Try setting the ghost entity name to either the character name or the player name.
             // If all else fails, it'll default to the default entity prototype name, "observer".
             // However, that should rarely happen.
-            // WWDP EDIT START
             if (FirstNonNullNonEmpty(mind.Comp.CharacterName, mind.Comp.Session?.Name) is string ghostName)
                 _metaData.SetEntityName(ghost, ghostName);
-            // WWDP EDIT END
 
             if (mind.Comp.TimeOfDeath.HasValue)
             {
@@ -608,16 +659,175 @@ namespace Content.Server.Ghost
                 _minds.TransferTo(mind.Owner, ghost, mind: mind.Comp);
             Log.Debug($"Spawned ghost \"{ToPrettyString(ghost)}\" for {mind.Comp.CharacterName}.");
             return ghost;
+        }
 
-            // WWDP EDIT START
-            static string? FirstNonNullNonEmpty(params string?[] strings)
+        private EntityUid SpawnFallbackGhost(Entity<MindComponent?> mind, EntityCoordinates spawnPosition)
+        {
+            CustomGhostPrototype? customGhost = null;
+            if (_prototypeManager.TryIndex(_prefs.GetPreferencesOrNull(mind.Comp.UserId)?.CustomGhost, out var ghostProto))
+                customGhost = ghostProto;
+
+            return SpawnAtPosition(customGhost?.GhostEntityPrototype ?? GameTicker.ObserverPrototypeName, spawnPosition);
+        }
+
+        private bool TrySpawnLobbyObserverGhost(Entity<MindComponent?> mind, EntityCoordinates spawnPosition, out EntityUid ghost)
+        {
+            ghost = default;
+
+            if (!_prototypeManager.HasIndex<EntityPrototype>(VisualObserverPrototypeName))
+                return false;
+
+            if (mind.Comp.UserId is not { } userId)
+                return false;
+
+            var prefs = _prefs.GetPreferencesOrNull(userId);
+            if (prefs?.SelectedCharacter is not HumanoidCharacterProfile profile)
+                return false;
+
+            ghost = SpawnAtPosition(VisualObserverPrototypeName, spawnPosition);
+
+            if (!HasComp<HumanoidAppearanceComponent>(ghost))
             {
-                foreach (var str in strings)
-                    if (!string.IsNullOrWhiteSpace(str))
-                        return str;
-                return null;
+                QueueDel(ghost);
+                ghost = default;
+                return false;
             }
-            // WWDP EDIT END
+
+            _humanoid.LoadProfile(ghost, profile, loadExtensions: false, generateLoadouts: false);
+            _metaData.SetEntityName(ghost, profile.Name);
+
+            if (PickLobbyObserverJob(profile) is not { } jobId ||
+                !_prototypeManager.TryIndex<JobPrototype>(jobId, out var jobProto))
+            {
+                return true;
+            }
+
+            if (jobProto.StartingGear != null &&
+                _prototypeManager.TryIndex<StartingGearPrototype>(jobProto.StartingGear, out var startingGear))
+            {
+                startingGear = _stationSpawning.ApplySubGear(startingGear, profile, jobProto);
+                _stationSpawning.EquipStartingGear(ghost, startingGear, raiseEvent: false);
+            }
+
+            if (!_configurationManager.GetCVar(CCVars.GameLoadoutsEnabled))
+                return true;
+
+            Dictionary<string, TimeSpan> playTimes = new();
+            var whitelisted = false;
+            if (_playerManager.TryGetSessionById(userId, out var session))
+            {
+                if (_playTimeTracking.TryGetTrackerTimes(session, out var trackedTimes))
+                    playTimes = trackedTimes;
+
+                whitelisted = session.ContentData()?.Whitelisted ?? false;
+            }
+
+            _loadout.ApplyCharacterLoadout(ghost, jobId, profile, playTimes, whitelisted, jobProto: jobProto);
+            return true;
+        }
+
+        private ProtoId<JobPrototype>? PickLobbyObserverJob(HumanoidCharacterProfile profile)
+        {
+            foreach (var (job, priority) in profile.JobPriorities)
+            {
+                if (priority != JobPriority.High || !_prototypeManager.HasIndex<JobPrototype>(job))
+                    continue;
+
+                return job;
+            }
+
+            var overflowJob = new ProtoId<JobPrototype>(SharedGameTicker.FallbackOverflowJob);
+            return _prototypeManager.HasIndex<JobPrototype>(overflowJob)
+                ? overflowJob
+                : null;
+        }
+
+        private bool TrySpawnBodySnapshotGhost(EntityUid sourceEntity, EntityCoordinates spawnPosition, out EntityUid ghost)
+        {
+            ghost = default;
+
+            if (!_prototypeManager.HasIndex<EntityPrototype>(VisualObserverPrototypeName))
+                return false;
+
+            if (!HasComp<HumanoidAppearanceComponent>(sourceEntity))
+                return false;
+
+            ghost = SpawnAtPosition(VisualObserverPrototypeName, spawnPosition);
+
+            if (!HasComp<HumanoidAppearanceComponent>(ghost))
+            {
+                QueueDel(ghost);
+                ghost = default;
+                return false;
+            }
+
+            _humanoid.CloneAppearance(sourceEntity, ghost);
+            CopyDamageSnapshot(sourceEntity, ghost);
+            CopyInventorySnapshot(sourceEntity, ghost);
+
+            return true;
+        }
+
+        private void CopyDamageSnapshot(EntityUid sourceEntity, EntityUid ghost)
+        {
+            if (!TryComp<DamageableComponent>(sourceEntity, out var sourceDamageable) ||
+                !TryComp<DamageableComponent>(ghost, out var ghostDamageable))
+            {
+                return;
+            }
+
+            _damageable.SetDamage(ghost, ghostDamageable, new DamageSpecifier(sourceDamageable.Damage));
+        }
+
+        private void CopyInventorySnapshot(EntityUid sourceEntity, EntityUid ghost)
+        {
+            if (!_inventory.TryGetSlots(sourceEntity, out var slots))
+                return;
+
+            foreach (var slot in slots)
+            {
+                if (!_inventory.TryGetSlotEntity(sourceEntity, slot.Name, out var sourceItem))
+                    continue;
+
+                CopyInventorySlotVisualSnapshot(sourceItem.Value, ghost, slot.Name);
+            }
+        }
+
+        private void CopyInventorySlotVisualSnapshot(EntityUid sourceItem, EntityUid ghost, string slotName)
+        {
+            var prototype = MetaData(sourceItem).EntityPrototype?.ID;
+            if (prototype == null || !_prototypeManager.HasIndex<EntityPrototype>(prototype))
+                return;
+
+            var clone = SpawnAtPosition(prototype, Transform(ghost).Coordinates);
+
+            if (TryComp<ItemComponent>(sourceItem, out var sourceItemComp) &&
+                TryComp<ItemComponent>(clone, out var cloneItemComp))
+            {
+                _item.CopyVisuals(clone, sourceItemComp, cloneItemComp);
+            }
+
+            if (TryComp<ClothingComponent>(sourceItem, out var sourceClothingComp) &&
+                TryComp<ClothingComponent>(clone, out var cloneClothingComp))
+            {
+                _clothing.CopyVisuals(clone, sourceClothingComp, cloneClothingComp);
+            }
+
+            _appearance.CopyData(sourceItem, clone);
+
+            if (!_inventory.TryEquip(ghost, clone, slotName, silent: true, force: true))
+                QueueDel(clone);
+        }
+
+        private static string? FirstNonNullNonEmpty(params string?[] strings)
+        {
+            foreach (var str in strings)
+            {
+                if (!string.IsNullOrWhiteSpace(str))
+                    return str;
+            }
+
+            return null;
         }
 
         public bool OnGhostAttempt(EntityUid mindId, bool canReturnGlobal, bool viaCommand = false, MindComponent? mind = null)
@@ -702,7 +912,7 @@ namespace Content.Server.Ghost
             if (playerEntity != null)
                 _adminLog.Add(LogType.Mind, $"{EntityManager.ToPrettyString(playerEntity.Value):player} ghosted{(!canReturn ? " (non-returnable)" : "")}");
 
-            var ghost = SpawnGhost((mindId, mind), position, canReturn);
+            var ghost = SpawnGhost((mindId, mind), position, canReturn, playerEntity);
 
             if (ghost == null)
                 return false;
