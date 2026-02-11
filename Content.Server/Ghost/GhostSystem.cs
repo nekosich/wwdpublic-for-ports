@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server.Administration.Logs;
+using Content.Server.Body.Components;
 using Content.Server.Chat.Managers;
 using Content.Server.Clothing.Systems;
 using Content.Server.GameTicking;
@@ -19,6 +20,7 @@ using Content.Shared._White.Roles;
 using Content.Shared.Actions;
 using Content.Shared.CCVar;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Database;
 using Content.Shared.Examine;
@@ -99,6 +101,7 @@ namespace Content.Server.Ghost
 
         private EntityQuery<GhostComponent> _ghostQuery;
         private EntityQuery<PhysicsComponent> _physicsQuery;
+        private readonly Dictionary<EntityUid, EntityUid> _mindHumanoidSnapshotSources = new();
 
         public static readonly Color AntagonistButtonColor = Color.FromHex("#7F4141"); // WWDP EDIT
 
@@ -145,6 +148,8 @@ namespace Content.Server.Ghost
             SubscribeLocalEvent<GhostComponent, MindRemovedMessage>(OnMindRemovedMessage);
             SubscribeLocalEvent<GhostComponent, MindUnvisitedMessage>(OnMindUnvisitedMessage);
             SubscribeLocalEvent<GhostComponent, PlayerDetachedEvent>(OnPlayerDetached);
+            SubscribeLocalEvent<MindComponent, MindGotRemovedEvent>(OnMindGotRemoved);
+            SubscribeLocalEvent<MindComponent, ComponentShutdown>(OnMindComponentShutdown);
 
             SubscribeLocalEvent<GhostOnMoveComponent, MoveInputEvent>(OnRelayMoveInput);
 
@@ -315,6 +320,16 @@ namespace Content.Server.Ghost
         private void OnPlayerDetached(EntityUid uid, GhostComponent component, PlayerDetachedEvent args)
         {
             DeleteEntity(uid);
+        }
+
+        private void OnMindGotRemoved(EntityUid uid, MindComponent component, MindGotRemovedEvent args)
+        {
+            TryCaptureMindHumanoidSnapshot(uid, args.Container.Owner);
+        }
+
+        private void OnMindComponentShutdown(EntityUid uid, MindComponent component, ComponentShutdown args)
+        {
+            ClearMindHumanoidSnapshot(uid);
         }
 
         private void DeleteEntity(EntityUid uid)
@@ -639,10 +654,13 @@ namespace Content.Server.Ghost
 
             EntityUid ghost = EntityUid.Invalid;
             var spawnedVisualGhost = false;
+            var snapshotSource = mode == GhostSpawnMode.Default
+                ? ResolveVisualSnapshotSource(mind.Owner, sourceEntity)
+                : null;
 
             if (mode == GhostSpawnMode.LobbyObserver)
                 spawnedVisualGhost = TrySpawnLobbyObserverGhost((mind.Owner, mind.Comp), spawnPosition.Value, out ghost);
-            else if (sourceEntity is { } source && Exists(source))
+            else if (snapshotSource is { } source)
                 spawnedVisualGhost = TrySpawnBodySnapshotGhost(source, spawnPosition.Value, out ghost);
 
             if (!spawnedVisualGhost)
@@ -657,7 +675,10 @@ namespace Content.Server.Ghost
             }
 
             if (spawnedVisualGhost)
+            {
                 ghostComponent.CanGhostInteract = false;
+                EnsureComp<IgnoreSlowOnDamageComponent>(ghost);
+            }
 
             // Try setting the ghost entity name to either the character name or the player name.
             // If all else fails, it'll default to the default entity prototype name, "observer".
@@ -791,6 +812,60 @@ namespace Content.Server.Ghost
             CopyInventorySnapshot(sourceEntity, ghost);
 
             return true;
+        }
+
+        private EntityUid? ResolveVisualSnapshotSource(EntityUid mindId, EntityUid? sourceEntity)
+        {
+            if (sourceEntity is { } source && Exists(source) && HasComp<HumanoidAppearanceComponent>(source))
+                return source;
+
+            return TryGetCachedMindHumanoidSnapshot(mindId, out var cached) ? cached : null;
+        }
+
+        private bool TryGetCachedMindHumanoidSnapshot(EntityUid mindId, out EntityUid cached)
+        {
+            cached = default;
+            if (!_mindHumanoidSnapshotSources.TryGetValue(mindId, out var snapshot))
+                return false;
+
+            if (!Exists(snapshot) || !HasComp<HumanoidAppearanceComponent>(snapshot))
+            {
+                _mindHumanoidSnapshotSources.Remove(mindId);
+                return false;
+            }
+
+            cached = snapshot;
+            return true;
+        }
+
+        private bool TryCaptureMindHumanoidSnapshot(EntityUid mindId, EntityUid sourceEntity)
+        {
+            if (!Exists(sourceEntity) || !HasComp<HumanoidAppearanceComponent>(sourceEntity))
+                return false;
+
+            ClearMindHumanoidSnapshot(mindId);
+
+            var snapshot = Spawn(VisualObserverPrototypeName, MapCoordinates.Nullspace);
+            if (!HasComp<HumanoidAppearanceComponent>(snapshot))
+            {
+                QueueDel(snapshot);
+                return false;
+            }
+
+            _mindHumanoidSnapshotSources[mindId] = snapshot;
+            _humanoid.CloneAppearance(sourceEntity, snapshot);
+            CopyDamageSnapshot(sourceEntity, snapshot);
+            CopyInventorySnapshot(sourceEntity, snapshot);
+            return true;
+        }
+
+        private void ClearMindHumanoidSnapshot(EntityUid mindId)
+        {
+            if (!_mindHumanoidSnapshotSources.Remove(mindId, out var snapshot))
+                return;
+
+            if (Exists(snapshot) && !TerminatingOrDeleted(snapshot))
+                QueueDel(snapshot);
         }
 
         private void CopyDamageSnapshot(EntityUid sourceEntity, EntityUid ghost)
