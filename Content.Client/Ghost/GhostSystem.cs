@@ -151,9 +151,11 @@ namespace Content.Client.Ghost
         {
             if (TryComp<SpriteComponent>(uid, out var sprite))
             {
-                for (var i = 0; i < sprite.AllLayers.Count(); i++)
+                var layerIndex = 0;
+                foreach (var _ in sprite.AllLayers)
                 {
-                    sprite.LayerSetColor(i, component.color);
+                    sprite.LayerSetColor(layerIndex, component.color);
+                    layerIndex++;
                 }
             }
 

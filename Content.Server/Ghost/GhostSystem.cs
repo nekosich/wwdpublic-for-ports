@@ -13,6 +13,7 @@ using Content.Server.Roles;
 using Content.Server.Roles.Jobs;
 using Content.Server.Station.Systems;
 using Content.Shared._White.CustomGhostSystem;
+using Content.Shared.Clothing.Components;
 using Content.Shared.Clothing.EntitySystems;
 using Content.Shared._White.Roles;
 using Content.Shared.Actions;
@@ -109,6 +110,24 @@ namespace Content.Server.Ghost
             Default,
             LobbyObserver
         }
+
+        private static readonly HashSet<string> VisualSnapshotSlots = new(StringComparer.Ordinal)
+        {
+            "shoes",
+            "jumpsuit",
+            "outerClothing",
+            "gloves",
+            "neck",
+            "mask",
+            "eyes",
+            "ears",
+            "head",
+            "id",
+            "belt",
+            "back",
+            "innerBelt",
+            "innerNeck"
+        };
 
         public override void Initialize()
         {
@@ -618,16 +637,16 @@ namespace Content.Server.Ghost
                 return null;
             }
 
-            EntityUid ghost;
+            EntityUid ghost = EntityUid.Invalid;
             var spawnedVisualGhost = false;
 
             if (mode == GhostSpawnMode.LobbyObserver)
-                spawnedVisualGhost = TrySpawnLobbyObserverGhost(mind, spawnPosition.Value, out ghost);
+                spawnedVisualGhost = TrySpawnLobbyObserverGhost((mind.Owner, mind.Comp), spawnPosition.Value, out ghost);
             else if (sourceEntity is { } source && Exists(source))
                 spawnedVisualGhost = TrySpawnBodySnapshotGhost(source, spawnPosition.Value, out ghost);
 
             if (!spawnedVisualGhost)
-                ghost = SpawnFallbackGhost(mind, spawnPosition.Value);
+                ghost = SpawnFallbackGhost((mind.Owner, mind.Comp), spawnPosition.Value);
 
             if (!TryComp<GhostComponent>(ghost, out var ghostComponent))
             {
@@ -661,7 +680,7 @@ namespace Content.Server.Ghost
             return ghost;
         }
 
-        private EntityUid SpawnFallbackGhost(Entity<MindComponent?> mind, EntityCoordinates spawnPosition)
+        private EntityUid SpawnFallbackGhost(Entity<MindComponent> mind, EntityCoordinates spawnPosition)
         {
             CustomGhostPrototype? customGhost = null;
             if (_prototypeManager.TryIndex(_prefs.GetPreferencesOrNull(mind.Comp.UserId)?.CustomGhost, out var ghostProto))
@@ -670,7 +689,7 @@ namespace Content.Server.Ghost
             return SpawnAtPosition(customGhost?.GhostEntityPrototype ?? GameTicker.ObserverPrototypeName, spawnPosition);
         }
 
-        private bool TrySpawnLobbyObserverGhost(Entity<MindComponent?> mind, EntityCoordinates spawnPosition, out EntityUid ghost)
+        private bool TrySpawnLobbyObserverGhost(Entity<MindComponent> mind, EntityCoordinates spawnPosition, out EntityUid ghost)
         {
             ghost = default;
 
@@ -696,7 +715,7 @@ namespace Content.Server.Ghost
             _humanoid.LoadProfile(ghost, profile, loadExtensions: false, generateLoadouts: false);
             _metaData.SetEntityName(ghost, profile.Name);
 
-            if (PickLobbyObserverJob(profile) is not { } jobId ||
+            if (!TryPickLobbyObserverJob(profile, out var jobId) ||
                 !_prototypeManager.TryIndex<JobPrototype>(jobId, out var jobProto))
             {
                 return true;
@@ -722,24 +741,30 @@ namespace Content.Server.Ghost
                 whitelisted = session.ContentData()?.Whitelisted ?? false;
             }
 
-            _loadout.ApplyCharacterLoadout(ghost, jobId, profile, playTimes, whitelisted, jobProto: jobProto);
+            _loadout.ApplyCharacterLoadout(ghost, jobId, profile, playTimes, whitelisted, deleteFailed: true, jobProto: jobProto);
             return true;
         }
 
-        private ProtoId<JobPrototype>? PickLobbyObserverJob(HumanoidCharacterProfile profile)
+        private bool TryPickLobbyObserverJob(HumanoidCharacterProfile profile, out ProtoId<JobPrototype> jobId)
         {
             foreach (var (job, priority) in profile.JobPriorities)
             {
                 if (priority != JobPriority.High || !_prototypeManager.HasIndex<JobPrototype>(job))
                     continue;
 
-                return job;
+                jobId = job;
+                return true;
             }
 
             var overflowJob = new ProtoId<JobPrototype>(SharedGameTicker.FallbackOverflowJob);
-            return _prototypeManager.HasIndex<JobPrototype>(overflowJob)
-                ? overflowJob
-                : null;
+            if (_prototypeManager.HasIndex<JobPrototype>(overflowJob))
+            {
+                jobId = overflowJob;
+                return true;
+            }
+
+            jobId = default;
+            return false;
         }
 
         private bool TrySpawnBodySnapshotGhost(EntityUid sourceEntity, EntityCoordinates spawnPosition, out EntityUid ghost)
@@ -784,22 +809,26 @@ namespace Content.Server.Ghost
             if (!_inventory.TryGetSlots(sourceEntity, out var slots))
                 return;
 
+            var ghostCoordinates = Transform(ghost).Coordinates;
             foreach (var slot in slots)
             {
+                if (!VisualSnapshotSlots.Contains(slot.Name))
+                    continue;
+
                 if (!_inventory.TryGetSlotEntity(sourceEntity, slot.Name, out var sourceItem))
                     continue;
 
-                CopyInventorySlotVisualSnapshot(sourceItem.Value, ghost, slot.Name);
+                CopyInventorySlotVisualSnapshot(sourceItem.Value, ghost, slot.Name, ghostCoordinates);
             }
         }
 
-        private void CopyInventorySlotVisualSnapshot(EntityUid sourceItem, EntityUid ghost, string slotName)
+        private void CopyInventorySlotVisualSnapshot(EntityUid sourceItem, EntityUid ghost, string slotName, EntityCoordinates ghostCoordinates)
         {
             var prototype = MetaData(sourceItem).EntityPrototype?.ID;
             if (prototype == null || !_prototypeManager.HasIndex<EntityPrototype>(prototype))
                 return;
 
-            var clone = SpawnAtPosition(prototype, Transform(ghost).Coordinates);
+            var clone = SpawnAtPosition(prototype, ghostCoordinates);
 
             if (TryComp<ItemComponent>(sourceItem, out var sourceItemComp) &&
                 TryComp<ItemComponent>(clone, out var cloneItemComp))
