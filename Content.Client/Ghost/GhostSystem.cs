@@ -1,43 +1,29 @@
+using System;
 using Content.Client.Movement.Systems;
 using Content.Shared.Actions;
 using Content.Shared.Ghost;
 using Robust.Client.Console;
 using Robust.Client.GameObjects;
+using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 
 namespace Content.Client.Ghost
 {
     public sealed class GhostSystem : SharedGhostSystem
     {
-        private const float GhostBodyAlphaFactor = 0.35f;
-        private const float GhostEquipmentAlphaFactor = 1.0f;
-
-        private static readonly string[] GhostEquipmentLayerKeys =
-        {
-            "jumpsuit",
-            "outerClothing",
-            "gloves",
-            "shoes",
-            "ears",
-            "innerBelt",
-            "innerNeck",
-            "eyes",
-            "belt",
-            "id",
-            "neck",
-            "back",
-            "suitstorage",
-            "mask",
-            "head"
-        };
+        private const string VisualObserverPrototypePrefix = "MobObserverVisual";
+        private const string CompositeGhostShaderId = "GhostCompositeTint";
 
         [Dependency] private readonly IClientConsoleHost _console = default!;
         [Dependency] private readonly IPlayerManager _playerManager = default!;
+        [Dependency] private readonly IPrototypeManager _prototype = default!;
         [Dependency] private readonly SharedActionsSystem _actions = default!;
         [Dependency] private readonly PointLightSystem _pointLightSystem = default!;
         [Dependency] private readonly ContentEyeSystem _contentEye = default!;
-        [Dependency] private readonly SpriteSystem _sprite = default!;
+
+        private readonly Dictionary<EntityUid, ShaderInstance> _compositeGhostShaders = new();
 
         public int AvailableGhostRoleCount { get; private set; }
 
@@ -95,7 +81,10 @@ namespace Content.Client.Ghost
         private void OnStartup(EntityUid uid, GhostComponent component, ComponentStartup args)
         {
             if (TryComp(uid, out SpriteComponent? sprite))
+            {
                 sprite.Visible = GhostVisibility || uid == _playerManager.LocalEntity;
+                ApplyGhostVisuals(uid, component, sprite);
+            }
         }
 
         private void OnToggleLighting(EntityUid uid, EyeComponent component, ToggleLightingActionEvent args)
@@ -152,6 +141,8 @@ namespace Content.Client.Ghost
 
         private void OnGhostRemove(EntityUid uid, GhostComponent component, ComponentRemove args)
         {
+            RemoveGhostCompositeShader(uid);
+
             _actions.RemoveAction(uid, component.ToggleLightingActionEntity);
             _actions.RemoveAction(uid, component.ToggleFoVActionEntity);
             _actions.RemoveAction(uid, component.ToggleGhostsActionEntity);
@@ -173,25 +164,7 @@ namespace Content.Client.Ghost
         private void OnGhostState(EntityUid uid, GhostComponent component, ref AfterAutoHandleStateEvent args)
         {
             if (TryComp<SpriteComponent>(uid, out var sprite))
-            {
-                var bodyColor = component.color.WithAlpha(component.color.A * GhostBodyAlphaFactor);
-                var equipmentColor = component.color.WithAlpha(component.color.A * GhostEquipmentAlphaFactor);
-                var layerIndex = 0;
-
-                foreach (var _ in sprite.AllLayers)
-                {
-                    _sprite.LayerSetColor((uid, sprite), layerIndex, bodyColor);
-                    layerIndex++;
-                }
-
-                foreach (var key in GhostEquipmentLayerKeys)
-                {
-                    if (!_sprite.LayerMapTryGet((uid, sprite), key, out var keyLayer, false))
-                        continue;
-
-                    _sprite.LayerSetColor((uid, sprite), keyLayer, equipmentColor);
-                }
-            }
+                ApplyGhostVisuals(uid, component, sprite);
 
             if (uid != _playerManager.LocalEntity)
                 return;
@@ -251,6 +224,53 @@ namespace Content.Client.Ghost
         {
             var msg = new GhostReturnToRoundRequest();
             RaiseNetworkEvent(msg);
+        }
+
+        private void ApplyGhostVisuals(EntityUid uid, GhostComponent component, SpriteComponent sprite)
+        {
+            // Apply composite ghost tint only for the new visual observer prototypes so
+            // legacy/custom ghosts remain untouched.
+            if (TryComp(uid, out MetaDataComponent? metaData) &&
+                metaData.EntityPrototype?.ID.StartsWith(VisualObserverPrototypePrefix, StringComparison.Ordinal) == true)
+            {
+                var shader = EnsureGhostCompositeShader(uid, sprite);
+                shader.SetParameter("ghost_tint", new Robust.Shared.Maths.Vector3(component.color.R, component.color.G, component.color.B));
+                shader.SetParameter("ghost_alpha", component.color.A);
+                sprite.Color = Color.White;
+                return;
+            }
+
+            // Non-humanoid / legacy ghosts keep classic color behavior for compatibility.
+            RemoveGhostCompositeShader(uid, sprite);
+            sprite.Color = component.color;
+        }
+
+        private ShaderInstance EnsureGhostCompositeShader(EntityUid uid, SpriteComponent sprite)
+        {
+            if (!_compositeGhostShaders.TryGetValue(uid, out var shader))
+            {
+                shader = _prototype.Index<ShaderPrototype>(CompositeGhostShaderId).InstanceUnique();
+                _compositeGhostShaders[uid] = shader;
+            }
+
+            if (sprite.PostShader != shader)
+                sprite.PostShader = shader;
+
+            return shader;
+        }
+
+        private void RemoveGhostCompositeShader(EntityUid uid, SpriteComponent? sprite = null)
+        {
+            if (!_compositeGhostShaders.Remove(uid, out var shader))
+                return;
+
+            if (sprite == null)
+                TryComp(uid, out sprite);
+
+            if (sprite != null && sprite.PostShader == shader)
+                sprite.PostShader = null;
+
+            shader.Dispose();
         }
     }
 }
