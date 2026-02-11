@@ -149,7 +149,7 @@ namespace Content.Server.Ghost
             SubscribeLocalEvent<GhostComponent, MindUnvisitedMessage>(OnMindUnvisitedMessage);
             SubscribeLocalEvent<GhostComponent, PlayerDetachedEvent>(OnPlayerDetached);
             SubscribeLocalEvent<MindComponent, MindGotRemovedEvent>(OnMindGotRemoved);
-            SubscribeLocalEvent<MindComponent, ComponentShutdown>(OnMindComponentShutdown);
+            SubscribeLocalEvent<MindComponent, EntityTerminatingEvent>(OnMindTerminating);
 
             SubscribeLocalEvent<GhostOnMoveComponent, MoveInputEvent>(OnRelayMoveInput);
 
@@ -327,7 +327,7 @@ namespace Content.Server.Ghost
             TryCaptureMindHumanoidSnapshot(uid, args.Container.Owner);
         }
 
-        private void OnMindComponentShutdown(EntityUid uid, MindComponent component, ComponentShutdown args)
+        private void OnMindTerminating(EntityUid uid, MindComponent component, ref EntityTerminatingEvent args)
         {
             ClearMindHumanoidSnapshot(uid);
         }
