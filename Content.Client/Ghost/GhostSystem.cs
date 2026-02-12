@@ -15,6 +15,7 @@ namespace Content.Client.Ghost
     {
         private const string VisualObserverPrototypePrefix = "MobObserverVisual";
         private const string CompositeGhostShaderId = "GhostCompositeTint";
+        private const float VisualObserverAlphaMultiplier = 0.50f;
 
         [Dependency] private readonly IClientConsoleHost _console = default!;
         [Dependency] private readonly IPlayerManager _playerManager = default!;
@@ -235,7 +236,7 @@ namespace Content.Client.Ghost
             {
                 var shader = EnsureGhostCompositeShader(uid, sprite);
                 shader.SetParameter("ghost_tint", new Robust.Shared.Maths.Vector3(component.color.R, component.color.G, component.color.B));
-                shader.SetParameter("ghost_alpha", component.color.A);
+                shader.SetParameter("ghost_alpha", Math.Clamp(component.color.A * VisualObserverAlphaMultiplier, 0f, 1f));
                 sprite.Color = Color.White;
                 return;
             }
