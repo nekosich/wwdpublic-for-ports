@@ -37,6 +37,7 @@ using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Players;
@@ -674,6 +675,8 @@ namespace Content.Server.Ghost
                 return null;
             }
 
+            CopyMovementDefaultsFromCurrentEntity(mind.Comp.CurrentEntity, ghost);
+
             if (spawnedVisualGhost)
             {
                 ghostComponent.CanGhostInteract = false;
@@ -701,6 +704,22 @@ namespace Content.Server.Ghost
                 _minds.TransferTo(mind.Owner, ghost, mind: mind.Comp);
             Log.Debug($"Spawned ghost \"{ToPrettyString(ghost)}\" for {mind.Comp.CharacterName}.");
             return ghost;
+        }
+
+        private void CopyMovementDefaultsFromCurrentEntity(EntityUid? sourceEntity, EntityUid ghost)
+        {
+            if (sourceEntity is not { } source ||
+                !TryComp<InputMoverComponent>(source, out var sourceMover) ||
+                !TryComp<InputMoverComponent>(ghost, out var ghostMover))
+            {
+                return;
+            }
+
+            if (ghostMover.DefaultSprinting == sourceMover.DefaultSprinting)
+                return;
+
+            ghostMover.DefaultSprinting = sourceMover.DefaultSprinting;
+            Dirty(ghost, ghostMover);
         }
 
         private EntityUid SpawnFallbackGhost(Entity<MindComponent> mind, EntityCoordinates spawnPosition)

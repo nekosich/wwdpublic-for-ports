@@ -34,7 +34,7 @@ namespace Content.Client.Interactable.Components
             if (!_entMan.TryGetComponent(uid, out SpriteComponent? sprite))
                 return;
 
-            if (sprite.PostShader == _shader)
+            if (_shader != null && sprite.PostShader == _shader)
                 return;
 
             // Save whatever post-shader was already on the sprite (e.g. ghost composite tint)
