@@ -1,0 +1,80 @@
+psychosis-hallucination-victim-unknown = someone
+psychosis-hallucination-stinger-fallback = LOOK AT ME.
+psychosis-hallucination-attack-stinger = IT IS RIGHT BEHIND YOU.
+
+psychosis-line-whisper-generic-1 = Did you hear that breathing?
+psychosis-line-whisper-generic-2 = They are watching from every corner.
+psychosis-line-whisper-generic-3 = Your name is still on their tongues.
+psychosis-line-whisper-species-human = Skin remembers what hands did.
+psychosis-line-whisper-species-reptilian = Your scales are rattling with fear.
+psychosis-line-whisper-species-moth = Dust from your wings marks the path.
+psychosis-line-whisper-species-ipc = Your logs were never deleted.
+psychosis-line-whisper-species-vox = Your flock hears every lie.
+psychosis-line-whisper-break-1 = Don't blink. It gets closer when you blink.
+psychosis-line-whisper-break-2 = Behind your shoulder. Again.
+
+psychosis-line-directive-generic-1 = Run. Not away. Deeper.
+psychosis-line-directive-generic-2 = End the noise. Make everything quiet.
+psychosis-line-directive-job-sec = Search them all. No one is innocent.
+psychosis-line-directive-job-command = Give an order they cannot forgive.
+psychosis-line-directive-job-med = Stitch bodies, not consciences.
+psychosis-line-directive-job-eng = Pull the wire. Watch the station hold its breath.
+psychosis-line-directive-job-science = Open the wrong door and call it research.
+psychosis-line-directive-job-cargo = Sell what should never be shipped.
+psychosis-line-directive-job-service = Smile while you poison the room with dread.
+psychosis-line-directive-job-assistant = Prove you matter. Any cost.
+psychosis-line-directive-antag-1 = They already suspect you. Act first.
+psychosis-line-directive-antag-2 = Burn the mask before they rip it off.
+psychosis-line-directive-break-1 = Fade out. Leave only silence.
+
+psychosis-line-accusation-generic-1 = You are the reason this place feels wrong.
+psychosis-line-accusation-generic-2 = Every corridor remembers your footsteps.
+psychosis-line-accusation-job-sec = You swore to protect, and still they fell.
+psychosis-line-accusation-job-command = Your authority is just louder guilt.
+psychosis-line-accusation-job-med = You heal flesh and rot hearts.
+psychosis-line-accusation-job-eng = One loose bolt and everything screamed.
+psychosis-line-accusation-job-science = You called cruelty curiosity.
+psychosis-line-accusation-job-cargo = You priced lives in crates and credits.
+psychosis-line-accusation-job-service = You serve comfort while feeding fear.
+psychosis-line-accusation-job-assistant = Invisible? No. Unforgiven.
+psychosis-line-accusation-antag = Predator pretending to be prey.
+psychosis-line-accusation-killer-1 = Count them again. You missed one.
+psychosis-line-accusation-killer-2 = Their blood never left your hands.
+
+psychosis-line-murder-echo-1 = {$victim}: "I was number {$killCount}, wasn't I?"
+psychosis-line-murder-echo-2 = {$victim}: "You remember my face now. Good."
+psychosis-line-murder-echo-3 = {$victim}: "Say my name if you're brave."
+psychosis-line-murder-echo-4 = {$victim}: "You made me quiet. I made you empty."
+psychosis-line-murder-echo-5 = {$victim}: "How many more until you disappear too?"
+psychosis-line-murder-echo-6 = {$victim}: "I was real. Your excuses weren't."
+
+psychosis-line-pseudo-attack-1 = It lunges and stops one breath away.
+psychosis-line-pseudo-attack-2 = Cold hands almost close on your throat.
+psychosis-line-pseudo-attack-killer = A familiar silhouette swings at your chest.
+psychosis-line-pseudo-attack-antag = The hunt turned around. You're prey now.
+psychosis-line-pseudo-attack-break = It charges through you and leaves ice.
+
+psychosis-line-stinger-1 = THEY KNOW.
+psychosis-line-stinger-2 = YOU CANNOT OUTRUN MEMORY.
+psychosis-line-stinger-3 = YOUR FACE DOESN'T BELONG TO YOU.
+psychosis-line-stinger-killer = THEY ARE STILL COUNTING.
+psychosis-line-stinger-antag = YOUR COVER IS ALREADY GONE.
+
+psychosis-line-fallback-whisper-prodromal = A whisper rides your breath.
+psychosis-line-fallback-whisper-active = The walls keep repeating your name.
+psychosis-line-fallback-whisper-break = You are surrounded by voices.
+psychosis-line-fallback-directive-prodromal = Keep moving. Do not trust the silence.
+psychosis-line-fallback-directive-active = Do something before they do.
+psychosis-line-fallback-directive-break = Break the stillness. Now.
+psychosis-line-fallback-accusation-prodromal = You already know what you did.
+psychosis-line-fallback-accusation-active = Every look is a sentence.
+psychosis-line-fallback-accusation-break = There is no absolution left for you.
+psychosis-line-fallback-murder-echo-prodromal = {$victim}: "I am not gone."
+psychosis-line-fallback-murder-echo-active = {$victim}: "Count me in your sleep."
+psychosis-line-fallback-murder-echo-break = {$victim}: "You made {$killCount} graves and still feel nothing."
+psychosis-line-fallback-pseudo-attack-prodromal = Something moves at the edge of your sight.
+psychosis-line-fallback-pseudo-attack-active = It lunges before you can breathe.
+psychosis-line-fallback-pseudo-attack-break = A phantom strike tears through your nerve.
+psychosis-line-fallback-screen-stinger-prodromal = DON'T LOOK AWAY.
+psychosis-line-fallback-screen-stinger-active = THEY ARE CLOSER.
+psychosis-line-fallback-screen-stinger-break = YOU ARE NOT ALONE IN YOUR HEAD.

@@ -15,21 +15,21 @@ void fragment() {
     highp vec2 uv = FRAGCOORD.xy * SCREEN_PIXEL_SIZE.xy;
     highp float t = TIME;
 
-    highp float line = sin((uv.y + t * 0.9) * 520.0) * 0.0018 * glitch * effectScale;
+    highp float line = sin((uv.y + t * 0.9) * 520.0) * 0.0018 * glitch;
     highp vec2 jitter = vec2(line, 0.0);
-    highp vec2 chroma = vec2(0.0028 * aberration * effectScale, 0.0);
+    highp vec2 chroma = vec2(0.0028 * aberration, 0.0);
 
     highp float r = zTextureSpec(SCREEN_TEXTURE, uv + jitter + chroma).r;
     highp float g = zTextureSpec(SCREEN_TEXTURE, uv + jitter).g;
     highp float b = zTextureSpec(SCREEN_TEXTURE, uv + jitter - chroma).b;
     highp vec3 color = vec3(r, g, b);
 
-    highp float grain = (hash(uv * vec2(2048.0, 1024.0) + t) - 0.5) * noiseStrength * effectScale;
+    highp float grain = (hash(uv * vec2(2048.0, 1024.0) + t) - 0.5) * noiseStrength;
     color += grain;
 
     highp vec2 center = uv - vec2(0.5, 0.5);
     highp float vig = smoothstep(0.22, 0.95, length(center) * 1.4);
-    color *= 1.0 - vig * vignette * effectScale;
+    color *= 1.0 - vig * vignette;
 
     COLOR = vec4(clamp(color, 0.0, 1.0), 1.0);
 }

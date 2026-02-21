@@ -1,0 +1,490 @@
+﻿- type: psychosisLine
+  id: PsychosisWhisperGeneric01
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-generic-1
+  tags: [ generic, stage:prodromal ]
+  weight: 1.0
+
+- type: psychosisLine
+  id: PsychosisWhisperGeneric02
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-generic-2
+  tags: [ generic, stage:active ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisWhisperGeneric03
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-generic-3
+  tags: [ generic, stage:break ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisWhisperHuman
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-species-human
+  tags: [ species:human, stage:active ]
+  weight: 0.8
+
+- type: psychosisLine
+  id: PsychosisWhisperReptilian
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-species-reptilian
+  tags: [ species:reptilian, stage:active ]
+  weight: 0.8
+
+- type: psychosisLine
+  id: PsychosisWhisperMoth
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-species-moth
+  tags: [ species:moth, stage:active ]
+  weight: 0.8
+
+- type: psychosisLine
+  id: PsychosisWhisperIpc
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-species-ipc
+  tags: [ species:ipc, stage:active ]
+  weight: 0.8
+
+- type: psychosisLine
+  id: PsychosisWhisperVox
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-species-vox
+  tags: [ species:vox, stage:active ]
+  weight: 0.8
+
+- type: psychosisLine
+  id: PsychosisWhisperBreakOnly01
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-break-1
+  tags: [ stage:break, break-only ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisWhisperBreakOnly02
+  incidentType: Whisper
+  locKey: psychosis-line-whisper-break-2
+  tags: [ stage:break, break-only ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisDirectiveGeneric01
+  incidentType: Directive
+  locKey: psychosis-line-directive-generic-1
+  tags: [ generic, stage:active ]
+  weight: 1.0
+
+- type: psychosisLine
+  id: PsychosisDirectiveGeneric02
+  incidentType: Directive
+  locKey: psychosis-line-directive-generic-2
+  tags: [ generic, stage:break ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisDirectiveSec
+  incidentType: Directive
+  locKey: psychosis-line-directive-job-sec
+  tags: [ job:sec, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisDirectiveCommand
+  incidentType: Directive
+  locKey: psychosis-line-directive-job-command
+  tags: [ job:command, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisDirectiveMed
+  incidentType: Directive
+  locKey: psychosis-line-directive-job-med
+  tags: [ job:med, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisDirectiveEng
+  incidentType: Directive
+  locKey: psychosis-line-directive-job-eng
+  tags: [ job:eng, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisDirectiveScience
+  incidentType: Directive
+  locKey: psychosis-line-directive-job-science
+  tags: [ job:science, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisDirectiveCargo
+  incidentType: Directive
+  locKey: psychosis-line-directive-job-cargo
+  tags: [ job:cargo, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisDirectiveService
+  incidentType: Directive
+  locKey: psychosis-line-directive-job-service
+  tags: [ job:service, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisDirectiveAssistant
+  incidentType: Directive
+  locKey: psychosis-line-directive-job-assistant
+  tags: [ job:assistant, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisDirectiveAntag01
+  incidentType: Directive
+  locKey: psychosis-line-directive-antag-1
+  tags: [ antag:true, stage:active ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisDirectiveAntag02
+  incidentType: Directive
+  locKey: psychosis-line-directive-antag-2
+  tags: [ antag:true, stage:break ]
+  weight: 1.2
+
+- type: psychosisLine
+  id: PsychosisDirectiveBreakOnly
+  incidentType: Directive
+  locKey: psychosis-line-directive-break-1
+  tags: [ stage:break, break-only ]
+  weight: 1.0
+
+- type: psychosisLine
+  id: PsychosisAccusationGeneric01
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-generic-1
+  tags: [ generic, stage:active ]
+  weight: 1.0
+
+- type: psychosisLine
+  id: PsychosisAccusationGeneric02
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-generic-2
+  tags: [ generic, stage:break ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisAccusationSec
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-job-sec
+  tags: [ job:sec, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisAccusationCommand
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-job-command
+  tags: [ job:command, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisAccusationMed
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-job-med
+  tags: [ job:med, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisAccusationEng
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-job-eng
+  tags: [ job:eng, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisAccusationScience
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-job-science
+  tags: [ job:science, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisAccusationCargo
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-job-cargo
+  tags: [ job:cargo, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisAccusationService
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-job-service
+  tags: [ job:service, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisAccusationAssistant
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-job-assistant
+  tags: [ job:assistant, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisAccusationAntag
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-antag
+  tags: [ antag:true, stage:active ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisAccusationKiller01
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-killer-1
+  tags: [ killer:true, stage:active ]
+  weight: 1.2
+
+- type: psychosisLine
+  id: PsychosisAccusationKiller02
+  incidentType: Accusation
+  locKey: psychosis-line-accusation-killer-2
+  tags: [ killer:true, stage:break ]
+  weight: 1.3
+
+- type: psychosisLine
+  id: PsychosisMurderEcho01
+  incidentType: MurderEcho
+  locKey: psychosis-line-murder-echo-1
+  tags: [ killer:true, stage:active ]
+  weight: 1.0
+
+- type: psychosisLine
+  id: PsychosisMurderEcho02
+  incidentType: MurderEcho
+  locKey: psychosis-line-murder-echo-2
+  tags: [ killer:true, stage:active ]
+  weight: 1.0
+
+- type: psychosisLine
+  id: PsychosisMurderEcho03
+  incidentType: MurderEcho
+  locKey: psychosis-line-murder-echo-3
+  tags: [ killer:true, stage:break ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisMurderEcho04
+  incidentType: MurderEcho
+  locKey: psychosis-line-murder-echo-4
+  tags: [ killer:true, stage:break, break-only ]
+  weight: 1.2
+
+- type: psychosisLine
+  id: PsychosisMurderEcho05
+  incidentType: MurderEcho
+  locKey: psychosis-line-murder-echo-5
+  tags: [ killer:true, stage:break ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisMurderEcho06
+  incidentType: MurderEcho
+  locKey: psychosis-line-murder-echo-6
+  tags: [ killer:true, stage:active ]
+  weight: 0.9
+
+- type: psychosisLine
+  id: PsychosisPseudoAttack01
+  incidentType: PseudoAttack
+  locKey: psychosis-line-pseudo-attack-1
+  tags: [ generic, stage:active ]
+  weight: 1.0
+
+- type: psychosisLine
+  id: PsychosisPseudoAttack02
+  incidentType: PseudoAttack
+  locKey: psychosis-line-pseudo-attack-2
+  tags: [ generic, stage:break ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisPseudoAttackKiller
+  incidentType: PseudoAttack
+  locKey: psychosis-line-pseudo-attack-killer
+  tags: [ killer:true, stage:break ]
+  weight: 1.2
+
+- type: psychosisLine
+  id: PsychosisPseudoAttackAntag
+  incidentType: PseudoAttack
+  locKey: psychosis-line-pseudo-attack-antag
+  tags: [ antag:true, stage:active ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisPseudoAttackBreakOnly
+  incidentType: PseudoAttack
+  locKey: psychosis-line-pseudo-attack-break
+  tags: [ stage:break, break-only ]
+  weight: 1.1
+
+- type: psychosisLine
+  id: PsychosisScreenStinger01
+  incidentType: ScreenStinger
+  locKey: psychosis-line-stinger-1
+  tags: [ generic, stage:active ]
+  weight: 1.0
+
+- type: psychosisLine
+  id: PsychosisScreenStinger02
+  incidentType: ScreenStinger
+  locKey: psychosis-line-stinger-2
+  tags: [ generic, stage:break ]
+  weight: 1.2
+
+- type: psychosisLine
+  id: PsychosisScreenStinger03
+  incidentType: ScreenStinger
+  locKey: psychosis-line-stinger-3
+  tags: [ generic, stage:break, break-only ]
+  weight: 1.2
+
+- type: psychosisLine
+  id: PsychosisScreenStingerKiller
+  incidentType: ScreenStinger
+  locKey: psychosis-line-stinger-killer
+  tags: [ killer:true, stage:break ]
+  weight: 1.3
+
+- type: psychosisLine
+  id: PsychosisScreenStingerAntag
+  incidentType: ScreenStinger
+  locKey: psychosis-line-stinger-antag
+  tags: [ antag:true, stage:break ]
+  weight: 1.2
+
+- type: psychosisLine
+  id: PsychosisFallbackWhisperProdromal
+  incidentType: Whisper
+  locKey: psychosis-line-fallback-whisper-prodromal
+  tags: [ generic, stage:prodromal ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackWhisperActive
+  incidentType: Whisper
+  locKey: psychosis-line-fallback-whisper-active
+  tags: [ generic, stage:active ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackWhisperBreak
+  incidentType: Whisper
+  locKey: psychosis-line-fallback-whisper-break
+  tags: [ generic, stage:break ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackDirectiveProdromal
+  incidentType: Directive
+  locKey: psychosis-line-fallback-directive-prodromal
+  tags: [ generic, stage:prodromal ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackDirectiveActive
+  incidentType: Directive
+  locKey: psychosis-line-fallback-directive-active
+  tags: [ generic, stage:active ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackDirectiveBreak
+  incidentType: Directive
+  locKey: psychosis-line-fallback-directive-break
+  tags: [ generic, stage:break ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackAccusationProdromal
+  incidentType: Accusation
+  locKey: psychosis-line-fallback-accusation-prodromal
+  tags: [ generic, stage:prodromal ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackAccusationActive
+  incidentType: Accusation
+  locKey: psychosis-line-fallback-accusation-active
+  tags: [ generic, stage:active ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackAccusationBreak
+  incidentType: Accusation
+  locKey: psychosis-line-fallback-accusation-break
+  tags: [ generic, stage:break ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackMurderEchoProdromal
+  incidentType: MurderEcho
+  locKey: psychosis-line-fallback-murder-echo-prodromal
+  tags: [ generic, stage:prodromal ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackMurderEchoActive
+  incidentType: MurderEcho
+  locKey: psychosis-line-fallback-murder-echo-active
+  tags: [ generic, stage:active ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackMurderEchoBreak
+  incidentType: MurderEcho
+  locKey: psychosis-line-fallback-murder-echo-break
+  tags: [ generic, stage:break ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackPseudoAttackProdromal
+  incidentType: PseudoAttack
+  locKey: psychosis-line-fallback-pseudo-attack-prodromal
+  tags: [ generic, stage:prodromal ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackPseudoAttackActive
+  incidentType: PseudoAttack
+  locKey: psychosis-line-fallback-pseudo-attack-active
+  tags: [ generic, stage:active ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackPseudoAttackBreak
+  incidentType: PseudoAttack
+  locKey: psychosis-line-fallback-pseudo-attack-break
+  tags: [ generic, stage:break ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackScreenStingerProdromal
+  incidentType: ScreenStinger
+  locKey: psychosis-line-fallback-screen-stinger-prodromal
+  tags: [ generic, stage:prodromal ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackScreenStingerActive
+  incidentType: ScreenStinger
+  locKey: psychosis-line-fallback-screen-stinger-active
+  tags: [ generic, stage:active ]
+  weight: 0.2
+
+- type: psychosisLine
+  id: PsychosisFallbackScreenStingerBreak
+  incidentType: ScreenStinger
+  locKey: psychosis-line-fallback-screen-stinger-break
+  tags: [ generic, stage:break ]
+  weight: 0.2
+

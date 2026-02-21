@@ -89,9 +89,9 @@ public sealed class PsychosisOverlay : Overlay
         return psychosis.Stage switch
         {
             SchizophreniaStage.Remission => Math.Clamp(severity * 0.01f, 0f, 0.01f),
-            SchizophreniaStage.Prodromal => Math.Clamp(0.02f + severity * 0.03f, 0f, 0.05f),
-            SchizophreniaStage.Active => Math.Clamp(0.05f + severity * 0.05f, 0f, 0.10f),
-            _ => Math.Clamp(0.09f + severity * 0.07f, 0f, 0.16f)
+            SchizophreniaStage.Prodromal => Math.Clamp(0.04f + severity * 0.04f, 0f, 0.08f),
+            SchizophreniaStage.Active => Math.Clamp(0.08f + severity * 0.06f, 0f, 0.14f),
+            _ => Math.Clamp(0.12f + severity * 0.08f, 0f, 0.20f)
         };
     }
 }

@@ -40,6 +40,7 @@ using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Components; // WWDP EDIT
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Psychiatry;
 using Content.Shared.Players; // WWDP EDIT
 using Content.Shared.Preferences; // WWDP EDIT
 using Content.Shared.Popups;
@@ -923,7 +924,7 @@ namespace Content.Server.Ghost
             return true;
         }
 
-        private bool TryGetVisualObserverPrototype(EntityUid sourceEntity, out string prototype)
+        public bool TryGetVisualObserverPrototype(EntityUid sourceEntity, out string prototype)
         {
             prototype = default!;
             if (!TryComp<HumanoidAppearanceComponent>(sourceEntity, out var humanoid))
@@ -932,7 +933,7 @@ namespace Content.Server.Ghost
             return TryGetVisualObserverPrototype(humanoid.Species, out prototype);
         }
 
-        private bool TryGetVisualObserverPrototype(ProtoId<SpeciesPrototype> species, out string prototype)
+        public bool TryGetVisualObserverPrototype(ProtoId<SpeciesPrototype> species, out string prototype)
         {
             if (_visualObserverBySpecies.TryGetValue(species, out var bySpecies))
             {
@@ -948,6 +949,84 @@ namespace Content.Server.Ghost
 
             prototype = default!;
             return false;
+        }
+
+        public bool TryBuildPsychosisVictimSnapshot(EntityUid sourceEntity, out PsychosisVictimSnapshot snapshot)
+        {
+            snapshot = default!;
+
+            if (!Exists(sourceEntity) ||
+                !TryGetVisualObserverPrototype(sourceEntity, out var observerPrototype) ||
+                !TryComp<HumanoidAppearanceComponent>(sourceEntity, out var humanoid))
+            {
+                return false;
+            }
+
+            var profile = BuildPsychosisSnapshotProfile(sourceEntity, humanoid);
+            var items = BuildPsychosisSnapshotItems(sourceEntity, observerPrototype);
+            snapshot = new PsychosisVictimSnapshot(
+                MetaData(sourceEntity).EntityName,
+                observerPrototype,
+                profile,
+                items);
+            return true;
+        }
+
+        private HumanoidCharacterProfile BuildPsychosisSnapshotProfile(
+            EntityUid sourceEntity,
+            HumanoidAppearanceComponent humanoid)
+        {
+            var profile = humanoid.LastProfileLoaded?.Clone() ?? HumanoidCharacterProfile.DefaultWithSpecies(humanoid.Species);
+
+            var appearance = profile.Appearance
+                .WithEyeColor(humanoid.EyeColor)
+                .WithSkinColor(humanoid.SkinColor)
+                .WithMarkings(humanoid.MarkingSet.GetForwardEnumerator().ToList());
+
+            profile = profile
+                .WithName(MetaData(sourceEntity).EntityName)
+                .WithSpecies(humanoid.Species)
+                .WithCustomSpeciesName(humanoid.CustomSpecieName)
+                .WithAge(humanoid.Age)
+                .WithSex(humanoid.Sex)
+                .WithGender(humanoid.Gender)
+                .WithBodyType(humanoid.BodyType)
+                .WithVoice(humanoid.Voice)
+                .WithHeight(humanoid.Height)
+                .WithWidth(humanoid.Width)
+                .WithCharacterAppearance(appearance);
+
+            return profile;
+        }
+
+        private List<PsychosisSnapshotItem> BuildPsychosisSnapshotItems(EntityUid sourceEntity, string observerPrototype)
+        {
+            var snapshots = new List<PsychosisSnapshotItem>();
+
+            if (!_prototypeManager.TryIndex<EntityPrototype>(observerPrototype, out var observerEntity) ||
+                !observerEntity.TryGetComponent<VisualObserverComponent>(out var visualObserver, _componentFactory) ||
+                visualObserver.SnapshotSlots.Count == 0)
+            {
+                return snapshots;
+            }
+
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var slotName in visualObserver.SnapshotSlots)
+            {
+                if (!seen.Add(slotName) ||
+                    !_inventory.TryGetSlotEntity(sourceEntity, slotName, out var sourceItem))
+                {
+                    continue;
+                }
+
+                var prototype = MetaData(sourceItem.Value).EntityPrototype?.ID;
+                if (prototype == null || !_prototypeManager.HasIndex<EntityPrototype>(prototype))
+                    continue;
+
+                snapshots.Add(new PsychosisSnapshotItem(slotName, prototype));
+            }
+
+            return snapshots;
         }
 
         private void ClearMindHumanoidSnapshot(EntityUid mindId)

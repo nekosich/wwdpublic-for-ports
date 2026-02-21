@@ -1,0 +1,80 @@
+psychosis-hallucination-victim-unknown = кто-то
+psychosis-hallucination-stinger-fallback = СМОТРИ НА МЕНЯ.
+psychosis-hallucination-attack-stinger = ОНО ПРЯМО ЗА ТОБОЙ.
+
+psychosis-line-whisper-generic-1 = Слышишь это дыхание?
+psychosis-line-whisper-generic-2 = Они смотрят из каждого угла.
+psychosis-line-whisper-generic-3 = Твоё имя всё ещё у них на языке.
+psychosis-line-whisper-species-human = Кожа помнит, что делали руки.
+psychosis-line-whisper-species-reptilian = Твоя чешуя дрожит от страха.
+psychosis-line-whisper-species-moth = Пыль с твоих крыльев выдаёт след.
+psychosis-line-whisper-species-ipc = Твои логи так и не стерлись.
+psychosis-line-whisper-species-vox = Твоя стая слышит каждую ложь.
+psychosis-line-whisper-break-1 = Не моргай. Оно ближе, когда моргаешь.
+psychosis-line-whisper-break-2 = За плечом. Снова.
+
+psychosis-line-directive-generic-1 = Беги. Не прочь. Глубже.
+psychosis-line-directive-generic-2 = Заглуши шум. Пусть всё станет тихо.
+psychosis-line-directive-job-sec = Проверь всех. Невиновных нет.
+psychosis-line-directive-job-command = Отдай приказ, который не простят.
+psychosis-line-directive-job-med = Сшивай тела, не совесть.
+psychosis-line-directive-job-eng = Дёрни провод. Станция задержит дыхание.
+psychosis-line-directive-job-science = Открой не ту дверь и назови это наукой.
+psychosis-line-directive-job-cargo = Продай то, что нельзя отправлять.
+psychosis-line-directive-job-service = Улыбайся, пока заливаешь комнату ужасом.
+psychosis-line-directive-job-assistant = Докажи, что ты значишь хоть что-то. Любой ценой.
+psychosis-line-directive-antag-1 = Тебя уже подозревают. Действуй первым.
+psychosis-line-directive-antag-2 = Сожги маску, пока её не сорвали.
+psychosis-line-directive-break-1 = Исчезни. Оставь только тишину.
+
+psychosis-line-accusation-generic-1 = Это место сломано из-за тебя.
+psychosis-line-accusation-generic-2 = Каждый коридор помнит твои шаги.
+psychosis-line-accusation-job-sec = Ты клялся защищать, но они всё равно пали.
+psychosis-line-accusation-job-command = Твоя власть — просто громкая вина.
+psychosis-line-accusation-job-med = Ты лечишь плоть и гноишь души.
+psychosis-line-accusation-job-eng = Один болт ослаб — и всё закричало.
+psychosis-line-accusation-job-science = Ты назвал жестокость любопытством.
+psychosis-line-accusation-job-cargo = Ты оценил жизни в ящиках и кредитах.
+psychosis-line-accusation-job-service = Ты подаёшь комфорт и кормишь страх.
+psychosis-line-accusation-job-assistant = Невидимка? Нет. Непрощённый.
+psychosis-line-accusation-antag = Хищник, притворяющийся добычей.
+psychosis-line-accusation-killer-1 = Пересчитай их снова. Одного забыл.
+psychosis-line-accusation-killer-2 = Их кровь так и не ушла с твоих рук.
+
+psychosis-line-murder-echo-1 = {$victim}: "Я был номером {$killCount}, да?"
+psychosis-line-murder-echo-2 = {$victim}: "Теперь ты помнишь моё лицо. Отлично."
+psychosis-line-murder-echo-3 = {$victim}: "Назови меня по имени, если смел."
+psychosis-line-murder-echo-4 = {$victim}: "Ты сделал меня тихим. Я сделал тебя пустым."
+psychosis-line-murder-echo-5 = {$victim}: "Сколько ещё, пока не исчезнешь и ты?"
+psychosis-line-murder-echo-6 = {$victim}: "Я был настоящим. Твои оправдания — нет."
+
+psychosis-line-pseudo-attack-1 = Оно бросается и замирает в одном вдохе от тебя.
+psychosis-line-pseudo-attack-2 = Ледяные руки почти сжимаются на твоём горле.
+psychosis-line-pseudo-attack-killer = Знакомый силуэт бьёт тебя в грудь.
+psychosis-line-pseudo-attack-antag = Охота развернулась. Теперь добыча — ты.
+psychosis-line-pseudo-attack-break = Оно проходит сквозь тебя, оставляя лёд.
+
+psychosis-line-stinger-1 = ОНИ ЗНАЮТ.
+psychosis-line-stinger-2 = ОТ ПАМЯТИ НЕ УБЕЖАТЬ.
+psychosis-line-stinger-3 = ТВОЁ ЛИЦО ТЕБЕ БОЛЬШЕ НЕ ПРИНАДЛЕЖИТ.
+psychosis-line-stinger-killer = ОНИ ВСЁ ЕЩЁ СЧИТАЮТ.
+psychosis-line-stinger-antag = ТВОЁ ПРИКРЫТИЕ УЖЕ СОРВАНО.
+
+psychosis-line-fallback-whisper-prodromal = Шёпот прилип к твоему дыханию.
+psychosis-line-fallback-whisper-active = Стены снова повторяют твоё имя.
+psychosis-line-fallback-whisper-break = Голоса теперь вокруг тебя.
+psychosis-line-fallback-directive-prodromal = Двигайся. Тишине нельзя верить.
+psychosis-line-fallback-directive-active = Сделай что-нибудь, пока не стало поздно.
+psychosis-line-fallback-directive-break = Разорви эту тишину. Сейчас.
+psychosis-line-fallback-accusation-prodromal = Ты и так знаешь, что сделал.
+psychosis-line-fallback-accusation-active = Каждый взгляд — это приговор.
+psychosis-line-fallback-accusation-break = Прощения для тебя больше нет.
+psychosis-line-fallback-murder-echo-prodromal = {$victim}: "Я никуда не исчез."
+psychosis-line-fallback-murder-echo-active = {$victim}: "Считай меня по ночам."
+psychosis-line-fallback-murder-echo-break = {$victim}: "Ты оставил {$killCount} могил и всё равно пуст."
+psychosis-line-fallback-pseudo-attack-prodromal = Что-то дёрнулось на границе зрения.
+psychosis-line-fallback-pseudo-attack-active = Оно бросается раньше твоего вдоха.
+psychosis-line-fallback-pseudo-attack-break = Фантомный удар режет по нервам.
+psychosis-line-fallback-screen-stinger-prodromal = НЕ ОТВОДИ ВЗГЛЯД.
+psychosis-line-fallback-screen-stinger-active = ОНИ УЖЕ БЛИЖЕ.
+psychosis-line-fallback-screen-stinger-break = ТЫ БОЛЬШЕ НЕ ОДИН В СВОЕЙ ГОЛОВЕ.

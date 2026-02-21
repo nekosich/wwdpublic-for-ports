@@ -10,6 +10,7 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Mood;
 using Content.Shared.Psychiatry;
 using Content.Shared.Rejuvenate;
+using Content.Server.Psychiatry.Components;
 using Robust.Shared.Timing;
 
 namespace Content.Server.Psychiatry;
@@ -28,8 +29,8 @@ public sealed class SchizophreniaSystem : EntitySystem
     private const float AcquisitionSeverity = 20f;
     private const float StressGrowthPerSecond = 0.08f;
     private const float ChemistryGrowthPerUnit = 0.06f;
-    private const float PassiveRecoveryPerSecond = 0.18f;
-    private const float StableRecoveryBonus = 0.12f;
+    private const float PassiveRecoveryPerSecond = 0.06f;
+    private const float StableRecoveryBonus = 0.03f;
 
     private const float ChemistryAcquisitionThreshold = 6f;
     private const float MaxChemistryGrowthLoad = 8f;
@@ -74,6 +75,8 @@ public sealed class SchizophreniaSystem : EntitySystem
 
     private void OnStartup(EntityUid uid, SchizophreniaComponent component, ComponentStartup args)
     {
+        EnsureComp<SchizophreniaMemoryComponent>(uid);
+
         component.Severity = Math.Clamp(component.Severity, MinSeverity, MaxSeverity);
         component.Stage = SchizophreniaRules.SeverityToStage(component.Severity);
         component.Remission = component.Stage == SchizophreniaStage.Remission;
@@ -82,6 +85,8 @@ public sealed class SchizophreniaSystem : EntitySystem
 
     private void OnRejuvenate(EntityUid uid, SchizophreniaComponent component, RejuvenateEvent args)
     {
+        RemComp<SchizophreniaMemoryComponent>(uid);
+
         component.Severity = MinSeverity;
         component.Remission = true;
         component.Stage = SchizophreniaStage.Remission;
