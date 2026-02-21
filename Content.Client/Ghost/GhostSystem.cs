@@ -1,20 +1,34 @@
+using System; // WWDP EDIT
 using Content.Client.Movement.Systems;
 using Content.Shared.Actions;
 using Content.Shared.Ghost;
 using Robust.Client.Console;
 using Robust.Client.GameObjects;
+using Robust.Client.Graphics; // WWDP EDIT
 using Robust.Client.Player;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes; // WWDP EDIT
 
 namespace Content.Client.Ghost
 {
     public sealed class GhostSystem : SharedGhostSystem
     {
+        // WWDP EDIT START
+        private sealed class GhostShaderData(ShaderInstance shader, string shaderName)
+        {
+            public ShaderInstance Shader = shader;
+            public string ShaderName = shaderName;
+        }
+        // WWDP EDIT END
+
         [Dependency] private readonly IClientConsoleHost _console = default!;
         [Dependency] private readonly IPlayerManager _playerManager = default!;
+        [Dependency] private readonly IPrototypeManager _prototype = default!; // WWDP EDIT
         [Dependency] private readonly SharedActionsSystem _actions = default!;
         [Dependency] private readonly PointLightSystem _pointLightSystem = default!;
         [Dependency] private readonly ContentEyeSystem _contentEye = default!;
+
+        private readonly Dictionary<EntityUid, GhostShaderData> _compositeGhostShaders = new(); // WWDP EDIT
 
         public int AvailableGhostRoleCount { get; private set; }
 
@@ -57,6 +71,7 @@ namespace Content.Client.Ghost
             SubscribeLocalEvent<GhostComponent, ComponentStartup>(OnStartup);
             SubscribeLocalEvent<GhostComponent, ComponentRemove>(OnGhostRemove);
             SubscribeLocalEvent<GhostComponent, AfterAutoHandleStateEvent>(OnGhostState);
+            SubscribeLocalEvent<VisualObserverComponent, AfterAutoHandleStateEvent>(OnVisualObserverState); // WWDP EDIT
 
             SubscribeLocalEvent<GhostComponent, LocalPlayerAttachedEvent>(OnGhostPlayerAttach);
             SubscribeLocalEvent<GhostComponent, LocalPlayerDetachedEvent>(OnGhostPlayerDetach);
@@ -71,8 +86,13 @@ namespace Content.Client.Ghost
 
         private void OnStartup(EntityUid uid, GhostComponent component, ComponentStartup args)
         {
+            // WWDP EDIT START
             if (TryComp(uid, out SpriteComponent? sprite))
+            {
                 sprite.Visible = GhostVisibility || uid == _playerManager.LocalEntity;
+                ApplyGhostVisuals(uid, component, sprite);
+            }
+            // WWDP EDIT END
         }
 
         private void OnToggleLighting(EntityUid uid, EyeComponent component, ToggleLightingActionEvent args)
@@ -119,8 +139,8 @@ namespace Content.Client.Ghost
             if (args.Handled)
                 return;
 
-            Popup.PopupEntity(Loc.GetString("ghost-gui-toggle-ghost-visibility-popup"), args.Performer);
-
+            var locId = GhostVisibility ? "ghost-gui-toggle-ghost-visibility-popup-off" : "ghost-gui-toggle-ghost-visibility-popup-on";
+            Popup.PopupEntity(Loc.GetString(locId), args.Performer);
             if (uid == _playerManager.LocalEntity)
                 ToggleGhostVisibility();
 
@@ -129,6 +149,8 @@ namespace Content.Client.Ghost
 
         private void OnGhostRemove(EntityUid uid, GhostComponent component, ComponentRemove args)
         {
+            RemoveGhostCompositeShader(uid); // WWDP EDIT
+
             _actions.RemoveAction(uid, component.ToggleLightingActionEntity);
             _actions.RemoveAction(uid, component.ToggleFoVActionEntity);
             _actions.RemoveAction(uid, component.ToggleGhostsActionEntity);
@@ -150,13 +172,26 @@ namespace Content.Client.Ghost
         private void OnGhostState(EntityUid uid, GhostComponent component, ref AfterAutoHandleStateEvent args)
         {
             if (TryComp<SpriteComponent>(uid, out var sprite))
-                sprite.LayerSetColor(0, component.color);
+                ApplyGhostVisuals(uid, component, sprite); // WWDP EDIT
 
             if (uid != _playerManager.LocalEntity)
                 return;
 
             PlayerUpdated?.Invoke(component);
         }
+
+        // WWDP EDIT START
+        private void OnVisualObserverState(EntityUid uid, VisualObserverComponent component, ref AfterAutoHandleStateEvent args)
+        {
+            if (!TryComp<GhostComponent>(uid, out var ghost) ||
+                !TryComp<SpriteComponent>(uid, out var sprite))
+            {
+                return;
+            }
+
+            ApplyGhostVisuals(uid, ghost, sprite);
+        }
+        // WWDP EDIT END
 
         private void OnGhostPlayerDetach(EntityUid uid, GhostComponent component, LocalPlayerDetachedEvent args)
         {
@@ -211,5 +246,72 @@ namespace Content.Client.Ghost
             var msg = new GhostReturnToRoundRequest();
             RaiseNetworkEvent(msg);
         }
+
+        // WWDP EDIT START
+        private void ApplyGhostVisuals(EntityUid uid, GhostComponent component, SpriteComponent sprite)
+        {
+            if (TryComp(uid, out VisualObserverComponent? visualObserver))
+            {
+                var shader = EnsureGhostCompositeShader(uid, sprite, visualObserver.ShaderName);
+                if (shader == null)
+                {
+                    sprite.Color = component.Color;
+                    return;
+                }
+
+                shader.SetParameter("ghost_tint", new Robust.Shared.Maths.Vector3(component.Color.R, component.Color.G, component.Color.B));
+                shader.SetParameter("ghost_alpha", Math.Clamp(component.Color.A * visualObserver.AlphaMultiplier, 0f, 1f));
+                sprite.Color = Color.White;
+                return;
+            }
+
+            RemoveGhostCompositeShader(uid, sprite);
+            sprite.Color = component.Color;
+        }
+
+        private ShaderInstance? EnsureGhostCompositeShader(EntityUid uid, SpriteComponent sprite, string shaderName)
+        {
+            if (!_prototype.TryIndex<ShaderPrototype>(shaderName, out var shaderPrototype))
+            {
+                RemoveGhostCompositeShader(uid, sprite);
+                return null;
+            }
+
+            if (!_compositeGhostShaders.TryGetValue(uid, out var shaderData))
+            {
+                var shader = shaderPrototype.InstanceUnique();
+                shaderData = new GhostShaderData(shader, shaderName);
+                _compositeGhostShaders[uid] = shaderData;
+            }
+            else if (shaderData.ShaderName != shaderName)
+            {
+                if (sprite.PostShader == shaderData.Shader)
+                    sprite.PostShader = null;
+
+                shaderData.Shader.Dispose();
+                shaderData.Shader = shaderPrototype.InstanceUnique();
+                shaderData.ShaderName = shaderName;
+            }
+
+            if (sprite.PostShader != shaderData.Shader)
+                sprite.PostShader = shaderData.Shader;
+
+            return shaderData.Shader;
+        }
+
+        private void RemoveGhostCompositeShader(EntityUid uid, SpriteComponent? sprite = null)
+        {
+            if (!_compositeGhostShaders.Remove(uid, out var shaderData))
+                return;
+
+            if (sprite == null)
+                TryComp(uid, out sprite);
+
+            if (sprite != null && sprite.PostShader == shaderData.Shader)
+                sprite.PostShader = null;
+
+            shaderData.Shader.Dispose();
+        }
+        // WWDP EDIT END
     }
 }
