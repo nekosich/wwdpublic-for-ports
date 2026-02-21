@@ -10,6 +10,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Medical;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Psychiatry;
 using Content.Shared.Traits.Assorted.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Player;
@@ -130,8 +131,12 @@ public sealed class PenLightSystem : EntitySystem
         // Hallucinating
         var seeingRainbows = _entityManager.HasComponent<SeeingRainbowsComponent>(target);
 
+        // Suspicion of severe psychotic destabilization.
+        var psychosisSuspected = _entityManager.TryGetComponent<SchizophreniaComponent>(target, out var psychosis)
+                                && psychosis.Stage >= SchizophreniaStage.Prodromal;
+
         // Healthy
-        var healthy = !(blind || drunk || eyeDamage || seeingRainbows);
+        var healthy = !(blind || drunk || eyeDamage || seeingRainbows || psychosisSuspected);
 
         _uiSystem.ServerSendUiMessage(
             penlight,
@@ -141,7 +146,8 @@ public sealed class PenLightSystem : EntitySystem
                 drunk,
                 eyeDamage,
                 healthy,
-                seeingRainbows
+                seeingRainbows,
+                psychosisSuspected
             )
         );
     }

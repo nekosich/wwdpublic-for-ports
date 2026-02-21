@@ -1,0 +1,19 @@
+- type: soundCollection
+  id: PsychosisVoices
+  files:
+  - /Audio/Effects/ghost.ogg
+  - /Audio/Effects/ghost2.ogg
+  - /Audio/Ambience/anomaly_scary.ogg
+  - /Audio/Ambience/spookyspace1.ogg
+  - /Audio/Ambience/spookyspace2.ogg
+  - /Audio/Voice/Human/male_sigh.ogg
+  - /Audio/Voice/Human/female_sigh.ogg
+  - /Audio/Voice/Misc/lowHiss1.ogg
+  - /Audio/Voice/Misc/lowHiss3.ogg
+
+- type: soundCollection
+  id: PsychosisScanner
+  files:
+  - /Audio/Machines/scan_finish.ogg
+  - /Audio/Machines/quickbeep.ogg
+  - /Audio/Machines/sonar-ping.ogg

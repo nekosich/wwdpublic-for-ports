@@ -347,12 +347,13 @@
         type: Add
         time: 10
         refresh: false
+      - !type:AdjustPsychosisSeverityEffect
+        amount: 1.8
       - !type:ChemRemovePsionic #Nyano - Summary: removes psionics from the user at 20u.
         conditions:
         - !type:ReagentThreshold
           reagent: MindbreakerToxin
           min: 20
-  # TODO: PROPER hallucinations
 
 - type: reagent
   id: Histamine
@@ -557,6 +558,8 @@
         component: Pacified
         type: Add
         time: 4
+      - !type:SuppressPsychosisEpisodesEffect
+        duration: 20
       - !type:ChemAddMoodlet
         moodPrototype: PaxEffect
 

@@ -148,6 +148,9 @@ reagent-desc-potassium-iodide = Will reduce the damaging effects of radiation by
 reagent-name-haloperidol = haloperidol
 reagent-desc-haloperidol = Removes most stimulating and hallucinogenic drugs. Reduces druggy effects and jitteriness. Causes drowsiness.
 
+reagent-name-neurocil = neurocil
+reagent-desc-neurocil = A focused antipsychotic stabilizer used for intensive cognitive decompression and episode suppression.
+
 reagent-name-artiplates = artiplates
 reagent-desc-artiplates = A highly advanced form of artificial blood that expands rapidly when introduced to the bloodstream. Due to its expansive properties, it can cause severe internal hemorrhaging in large doses.
 

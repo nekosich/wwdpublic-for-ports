@@ -552,11 +552,11 @@
     maxDuration: 300
     reoccurrenceDelay: 30
   - type: MassHallucinationsRule
-    minTimeBetweenIncidents: 0.1
-    maxTimeBetweenIncidents: 300
-    maxSoundDistance: 7
-    sounds:
-      collection: Paracusia
+    startSeverityBoost: 14
+    pulseSeverityBoost: 1.8
+    pulseInterval: 8
+    clearSuppressionOnStart: true
+    eventWaveFlag: true
 
 - type: entity
   parent: BaseGameRule

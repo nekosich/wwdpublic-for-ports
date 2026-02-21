@@ -65,6 +65,10 @@ namespace Content.Client.Eye.PenLight.UI
             if (msg.SeeingRainbows == true)
                 sb.AppendLine(Loc.GetString("pen-light-exam-hallucinating-text"));
 
+            // Indirect marker for psychotic destabilization.
+            if (msg.PsychosisSuspected == true)
+                sb.AppendLine(Loc.GetString("pen-light-exam-psychosis-suspected-text"));
+
             // Healthy
             if (msg.Healthy == true)
                 sb.AppendLine(Loc.GetString("pen-light-exam-healthy-text"));

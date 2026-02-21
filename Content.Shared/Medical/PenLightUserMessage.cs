@@ -10,8 +10,16 @@ public sealed class PenLightUserMessage : BoundUserInterfaceMessage
     public bool? EyeDamage;
     public bool? Healthy;
     public bool? SeeingRainbows;
+    public bool? PsychosisSuspected;
 
-    public PenLightUserMessage(NetEntity? targetEntity, bool? blind, bool? drunk, bool? eyeDamage, bool? healthy, bool? seeingRainbows)
+    public PenLightUserMessage(
+        NetEntity? targetEntity,
+        bool? blind,
+        bool? drunk,
+        bool? eyeDamage,
+        bool? healthy,
+        bool? seeingRainbows,
+        bool? psychosisSuspected)
     {
         TargetEntity = targetEntity;
         Blind = blind;
@@ -19,6 +27,7 @@ public sealed class PenLightUserMessage : BoundUserInterfaceMessage
         EyeDamage = eyeDamage;
         Healthy = healthy;
         SeeingRainbows = seeingRainbows;
+        PsychosisSuspected = psychosisSuspected;
     }
 }
 

@@ -157,6 +157,48 @@
 
 - type: entity
   parent: BaseItem
+  id: BrainWaveScannerCartridge
+  name: brain wave scanner cartridge
+  description: A program for scanning atypical cognitive wave patterns.
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/cartridge.rsi
+    state: cart-med
+  - type: Icon
+    sprite: Objects/Devices/cartridge.rsi
+    state: cart-med
+  - type: UIFragment
+    ui: !type:BrainWaveScannerUi
+  - type: Cartridge
+    programName: brain-wave-scanner-program-name
+    icon:
+      sprite: Objects/Specific/Medical/healthanalyzer.rsi
+      state: icon
+  - type: BrainWaveScannerCartridge
+
+- type: entity
+  parent: BaseItem
+  id: PsychInterpretCartridge
+  name: psych interpreter cartridge
+  description: A program for correlating symptoms with cognitive pattern signatures.
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/cartridge.rsi
+    state: cart-psi
+  - type: Icon
+    sprite: Objects/Devices/cartridge.rsi
+    state: cart-psi
+  - type: UIFragment
+    ui: !type:PsychInterpretUi
+  - type: Cartridge
+    programName: psych-interpret-program-name
+    icon:
+      sprite: DeltaV/Structures/Machines/glimmer_machines.rsi
+      state: prober
+  - type: PsychInterpretCartridge
+
+- type: entity
+  parent: BaseItem
   id: AstroNavCartridge
   name: AstroNav cartridge
   description: A program for navigation that provides GPS coordinates.

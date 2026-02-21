@@ -1,0 +1,29 @@
+<cartridges:BrainWaveScannerUiFragment xmlns:cartridges="clr-namespace:Content.Client.CartridgeLoader.Cartridges"
+                                       xmlns="https://spacestation14.io"
+                                       Margin="2">
+    <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
+        <Label Text="{Loc 'brain-wave-scanner-title'}"/>
+
+        <GridContainer Columns="2" Margin="0 4 0 4">
+            <Label Text="{Loc 'brain-wave-scanner-theta'}"/>
+            <Label Name="ThetaValue"/>
+
+            <Label Text="{Loc 'brain-wave-scanner-gamma'}"/>
+            <Label Name="GammaValue"/>
+
+            <Label Text="{Loc 'brain-wave-scanner-coherence'}"/>
+            <Label Name="CoherenceValue"/>
+
+            <Label Text="{Loc 'brain-wave-scanner-noise'}"/>
+            <Label Name="NoiseValue"/>
+
+            <Label Text="{Loc 'brain-wave-scanner-conductivity'}"/>
+            <Label Name="ConductivityValue"/>
+        </GridContainer>
+
+        <Label Name="NoScansLabel" Text="{Loc 'brain-wave-scanner-no-scans'}"/>
+        <ScrollContainer HorizontalExpand="True" VerticalExpand="True">
+            <BoxContainer Name="ScansContainer" Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True"/>
+        </ScrollContainer>
+    </BoxContainer>
+</cartridges:BrainWaveScannerUiFragment>

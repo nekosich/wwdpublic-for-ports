@@ -1,0 +1,15 @@
+- type: entity
+  id: PsychosisPhantom
+  name: phantom silhouette
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Tag
+    tags:
+    - HideContextMenu
+  - type: Sprite
+    noRot: true
+    sprite: Mobs/Ghosts/ghost_human.rsi
+    color: "#B6C7"
+    layers:
+    - state: animated
+      shader: unshaded

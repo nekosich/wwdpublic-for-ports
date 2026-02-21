@@ -156,3 +156,8 @@ mood-effect-DeepFriedEffect =
     I ate something deep fried! It was the tastiest thing I've ever had in my life!
 mood-effect-TastyEffect =
     That was really tasty!
+
+mood-effect-TherapyRelief =
+    I feel grounded and more stable after therapy.
+mood-effect-PsychoticDestabilization =
+    My thoughts keep splitting apart and slipping away.

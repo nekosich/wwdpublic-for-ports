@@ -152,3 +152,6 @@ reagent-desc-artiplates = A highly advanced form of artificial blood that expand
 
 reagent-name-enunciase = enunciase
 reagent-desc-enunciase = An enzyme that helps stimulate the language centers of the brain, relieving stuttering due to other drugs and temporarily forcing 'perfect' speech. Causes nausea in high doses.
+
+reagent-name-neurocil = нейроцил
+reagent-desc-neurocil = Профильный антипсихотик для снижения тяжести когнитивных эпизодов и стабилизации состояния.

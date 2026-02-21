@@ -1301,6 +1301,15 @@
     accentVColor: "#447987"
   - type: Sprite # WWDP edit
     sprite: _White/Objects/Devices/Pda/medical.rsi # WWDP edit
+  - type: CartridgeLoader
+    preinstalled:
+    - CrewManifestCartridge
+    - NotekeeperCartridge
+    - NewsReaderCartridge
+    - MedTekCartridge
+    - NanoChatCartridge
+    - BrainWaveScannerCartridge
+    - PsychInterpretCartridge
 
 - type: entity
   parent: BasePDA

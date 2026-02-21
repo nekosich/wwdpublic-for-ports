@@ -57,3 +57,35 @@ glimmer-monitor-current-glimmer = Текущее мерцание: {$glimmer}Ψ
 glimmer-monitor-interval = Интервал
 glimmer-monitor-sync = Синхронизация
 
+
+brain-wave-scanner-program-name = Сканер мозговых волн
+brain-wave-scanner-title = Сканер мозговых волн
+brain-wave-scanner-theta = Тета-дрейф
+brain-wave-scanner-gamma = Гамма-всплески
+brain-wave-scanner-coherence = Падение когерентности
+brain-wave-scanner-noise = Индекс шума
+brain-wave-scanner-conductivity = Стресс-проводимость
+brain-wave-scanner-no-scans = Сканов пока нет.
+brain-wave-scanner-entry = {$subject}: θ {$theta} | γ {$gamma} | ког {$coherence} | шум {$noise}
+brain-wave-scanner-scan = Профиль мозговых волн записан: {$target}.
+
+psych-interpret-program-name = Психоинтерпретатор
+psych-interpret-title = Интерпретатор когнитивных паттернов
+psych-interpret-symptoms-title = Отмеченные симптомы
+psych-interpret-run = Выполнить анализ
+psych-interpret-pattern = Код паттерна
+psych-interpret-confidence = Достоверность
+psych-interpret-protocol = Рекомендованный протокол
+psych-interpret-last-scan-none = Последний скан: отсутствует
+psych-interpret-last-scan = Последний скан: {$target}
+psych-interpret-popup-no-scan = Нет данных сканера мозговых волн.
+psych-interpret-notes-no-scan = Недостаточно данных. Выполните новый скан и повторите анализ.
+psych-interpret-notes-remission = Низкий уровень аномалий. Рекомендуется наблюдение.
+psych-interpret-notes-prodromal = Обнаружены ранние маркеры нестабильности. Рекомендуется раннее вмешательство.
+psych-interpret-notes-active = Обнаружен устойчивый паттерн нестабильности. Начните активный протокол.
+psych-interpret-notes-break = Обнаружен экстремальный профиль нестабильности. Нужен немедленный интенсивный протокол.
+psych-interpret-symptom-auditory_whispers = Слуховые шепоты
+psych-interpret-symptom-visual_phantoms = Визуальные фантомы
+psych-interpret-symptom-derealization = Дереализация
+psych-interpret-symptom-paranoid_dread = Параноидальный страх
+psych-interpret-symptom-thought_fragmentation = Фрагментация мышления

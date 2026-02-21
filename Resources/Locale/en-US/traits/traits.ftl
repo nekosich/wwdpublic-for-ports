@@ -718,3 +718,8 @@ trait-description-ForkedTongue =
 trait-name-StuntedSnout = Stunted Snout
 trait-description-StuntedSnout =
     Your sense of smell is stunted for one reason or another. You lack the ability to pick up scents.
+
+trait-name-Schizophrenia = Schizophrenia
+trait-description-Schizophrenia =
+    Your perception destabilizes under stress, causing escalating psychotic episodes.
+    Psychiatric diagnostics and treatment can reduce symptom severity.

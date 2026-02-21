@@ -1,0 +1,25 @@
+<cartridges:PsychInterpretUiFragment xmlns:cartridges="clr-namespace:Content.Client.CartridgeLoader.Cartridges"
+                                     xmlns="https://spacestation14.io"
+                                     Margin="2">
+    <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
+        <Label Text="{Loc 'psych-interpret-title'}"/>
+        <Label Name="LastScanLabel" Margin="0 2 0 4"/>
+
+        <Label Text="{Loc 'psych-interpret-symptoms-title'}"/>
+        <BoxContainer Name="SymptomsContainer" Orientation="Vertical" Margin="0 2 0 4"/>
+        <Button Name="InterpretButton" Text="{Loc 'psych-interpret-run'}"/>
+
+        <GridContainer Columns="2" Margin="0 6 0 2">
+            <Label Text="{Loc 'psych-interpret-pattern'}"/>
+            <Label Name="PatternValue"/>
+
+            <Label Text="{Loc 'psych-interpret-confidence'}"/>
+            <Label Name="ConfidenceValue"/>
+
+            <Label Text="{Loc 'psych-interpret-protocol'}"/>
+            <Label Name="ProtocolValue"/>
+        </GridContainer>
+
+        <Label Name="NotesLabel"/>
+    </BoxContainer>
+</cartridges:PsychInterpretUiFragment>

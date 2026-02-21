@@ -136,6 +136,17 @@
   moodChange: 100
   timeout: 60 #1 minute
 
+- type: moodEffect
+  id: TherapyRelief
+  moodChange: 12
+  timeout: 240
+  category: "Psychotherapy"
+
+- type: moodEffect
+  id: PsychoticDestabilization
+  moodChange: -8
+  category: "PsychosisState"
+
 # Food
 - type: moodEffect
   id: SweetenerEffect

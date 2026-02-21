@@ -48,6 +48,11 @@
   path: "/Textures/Shaders/rainbow.swsl"
 
 - type: shader
+  id: Psychosis
+  kind: source
+  path: "/Textures/Shaders/psychosis.swsl"
+
+- type: shader
   id: CameraStatic
   kind: source
   path: "/Textures/Shaders/camera_static.swsl"

@@ -1,26 +1,27 @@
+using System;
 using Content.Server.StationEvents.Events;
-using Robust.Shared.Audio;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Server.StationEvents.Components;
 
 [RegisterComponent, Access(typeof(MassHallucinationsRule))]
 public sealed partial class MassHallucinationsRuleComponent : Component
 {
-    /// <summary>
-    /// The maximum time between incidents in seconds
-    /// </summary>
-    [DataField("maxTimeBetweenIncidents", required: true), ViewVariables(VVAccess.ReadWrite)]
-    public float MaxTimeBetweenIncidents;
+    [DataField("startSeverityBoost")]
+    public float StartSeverityBoost = 10f;
 
-    /// <summary>
-    /// The minimum time between incidents in seconds
-    /// </summary>
-    [DataField("minTimeBetweenIncidents", required: true), ViewVariables(VVAccess.ReadWrite)]
-    public float MinTimeBetweenIncidents;
+    [DataField("pulseSeverityBoost")]
+    public float PulseSeverityBoost = 1.5f;
 
-    [DataField("maxSoundDistance", required: true), ViewVariables(VVAccess.ReadWrite)]
-    public float MaxSoundDistance;
+    [DataField("pulseInterval")]
+    public float PulseInterval = 10f;
 
-    [DataField("sounds", required: true)]
-    public SoundSpecifier Sounds = default!;
+    [DataField("clearSuppressionOnStart")]
+    public bool ClearSuppressionOnStart = true;
+
+    [DataField("eventWaveFlag")]
+    public bool EventWaveFlag = true;
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    public TimeSpan NextPulse;
 }
